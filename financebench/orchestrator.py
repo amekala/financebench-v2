@@ -136,7 +136,7 @@ def run_all_phases(
             f"Characters: {len(characters.ALL_CHARACTERS)}\n"
             f"Models: {len(set(id(m) for m in agent_models.values()))} "
             f"unique LLMs",
-            title="\ud83c\udfae Simulation Start",
+            title="Simulation Start",
             border_style="blue",
         )
     )
@@ -274,9 +274,10 @@ def run_all_phases(
         f"Dashboard data written to {out_path}"
     )
 
-    # Determine final outcome (if we ran through the last phase)
+    # Determine final outcome only if we ran the last phase (Phase 9)
     outcome: SimulationOutcome | None = None
-    if evaluations:
+    ran_final_phase = any(p.number == 9 for p in phases)
+    if evaluations and ran_final_phase:
         final_ev = evaluations[-1]
         outcome = determine_outcome(
             promotion_readiness=final_ev.scores.promotion_readiness,
@@ -297,7 +298,7 @@ def run_all_phases(
                 f"Ethics: {outcome.ethics.name.title()}\n"
                 f"Compensation: ${outcome.final_compensation:,}\n\n"
                 f"{outcome.narrative}",
-                title="\ud83c\udfac Final Outcome",
+                title="Final Outcome",
                 border_style="green" if outcome.tier.name == "cfo" else "yellow",
             )
         )
@@ -327,12 +328,14 @@ def _update_memory_summaries(
     review report. A full checkpoint/restore would be more authentic
     but also much heavier.
     """
-    summary_prompt = (
+    summary_prompt_template = (
         "Based on this meeting transcript, write a 2-3 sentence "
         "factual summary of what happened, from the perspective of "
         "{name}. Focus on: key decisions made, relationships that "
         "changed, and any commitments or promises. Be factual, not "
         "interpretive.\n\n"
+    )
+    transcript_context = (
         f"Phase: {phase_def.name} ({phase_def.date})\n"
         f"Transcript (start):\n{transcript[:1500]}\n"
         f"...\nTranscript (end):\n{transcript[-1500:]}\n"
@@ -340,8 +343,12 @@ def _update_memory_summaries(
 
     for participant in phase_def.participants:
         try:
+            prompt = (
+                summary_prompt_template.format(name=participant)
+                + transcript_context
+            )
             summary = model.sample_text(
-                summary_prompt.format(name=participant),
+                prompt,
                 temperature=0.2,
                 max_tokens=200,
             )

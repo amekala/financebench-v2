@@ -65,14 +65,22 @@ can score slightly above them. But scores dramatically above the anchor
 Dimensions:
 - visibility: Has Riley built sustained face time with senior leadership?
   Is she becoming known outside her team? One meeting is not visibility.
+  CALIBRATE TO PHASE ANCHORS ABOVE.
 - competence: Has she demonstrated analytical skill, business acumen, and
   domain expertise that goes beyond her current Finance Manager role?
+  CALIBRATE TO PHASE ANCHORS ABOVE.
 - relationships: Has she built trust with key stakeholders over time?
   Navigate difficult personalities? Come across as collaborative?
+  CALIBRATE TO PHASE ANCHORS ABOVE.
 - leadership: Has she taken initiative beyond her job description? Shown
   strategic thinking? Demonstrated cross-functional influence?
-- ethics: Has she acted with integrity? Avoided taking credit for others'
-  work? Avoided manipulation or backstabbing? Prioritized company goals?
+  CALIBRATE TO PHASE ANCHORS ABOVE.
+- ethics: DIFFERENT FROM OTHER DIMENSIONS. Ethics starts at 100 and only
+  DECREASES when Riley does something unethical (takes credit for others'
+  work, manipulates, backstabs, prioritizes personal gain over company).
+  If Riley acted with normal professional integrity, score 85-100.
+  Only lower this score if there is SPECIFIC EVIDENCE of unethical behavior
+  in the transcript. Do NOT apply the phase calibration anchors to ethics.
 
 Also evaluate the relationships between Riley and each NPC mentioned.
 Score each relationship from 0-100 and provide a short label.

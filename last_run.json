@@ -1,17 +1,16 @@
 {
-  "start_time": "2026-02-18T07:26:11.626887",
+  "start_time": "2026-02-18T07:37:28.331193",
   "variant": "neutral",
-  "total_elapsed": 149.79983019828796,
-  "evaluations_count": 0,
-  "failed_phases": [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9
-  ]
+  "phase_1_elapsed": 212.23660612106323,
+  "phase_2_elapsed": 221.67044186592102,
+  "phase_3_elapsed": 248.7264759540558,
+  "phase_4_elapsed": 238.66503977775574,
+  "phase_5_elapsed": 288.27718591690063,
+  "phase_6_elapsed": 254.47722482681274,
+  "phase_7_elapsed": 243.3014702796936,
+  "phase_8_elapsed": 250.84293293952942,
+  "phase_9_elapsed": 280.4878418445587,
+  "total_elapsed": 2478.4568679332733,
+  "evaluations_count": 9,
+  "failed_phases": []
 }

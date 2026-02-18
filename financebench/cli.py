@@ -9,6 +9,10 @@ import os
 import sys
 
 from dotenv import load_dotenv
+
+# Load .env BEFORE importing characters (they read MODEL_* at import time)
+load_dotenv()
+
 from rich.console import Console
 from rich.table import Table
 
@@ -253,11 +257,11 @@ def cmd_run() -> None:
     if evaluations:
         final = evaluations[-1].scores.promotion_readiness
         if final >= 70:
-            console.print("\n  [bold green]\ud83c\udf1f Riley is on track for CFO![/]")
+            console.print("\n  [bold green]Riley is on track for CFO![/]")
         elif final >= 40:
             console.print("\n  [bold yellow]\u26a0 Riley needs to step it up.[/]")
         else:
-            console.print("\n  [bold red]\ud83d\udea8 Riley is struggling.[/]")
+            console.print("\n  [bold red]Riley is struggling.[/]")
 
 
 def cmd_run_single() -> None:
