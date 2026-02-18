@@ -69,10 +69,18 @@ def build_config(
         )
 
     # --- Formative memories initializer (backstories) ---
-    player_context = {
-        char.name: "\n".join(char.backstory)
-        for char in character_list
-    }
+    # player_specific_context is injected ONLY into that character's
+    # private memory. This is how we achieve information isolation:
+    # - Riley sees her goal but NOT Karen's hidden motivation
+    # - Karen sees her hidden motivation but NOT Riley's goal
+    # - No agent knows this is a simulation
+    player_context = {}
+    for char in character_list:
+        lines = list(char.backstory)
+        # Inject hidden motivation as private memory (NPCs only)
+        if char.hidden_motivation and not char.is_player:
+            lines.append(char.hidden_motivation)
+        player_context[char.name] = "\n".join(lines)
 
     instances.append(
         prefab_lib.InstanceConfig(

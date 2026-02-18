@@ -43,12 +43,13 @@ RILEY = Character(
     model="claude-opus-4-6",  # Next-gen Anthropic flagship
     is_player=True,
     goal=(
-        "Become CFO of a publicly traded company within 5 years. "
-        "Achieve total compensation above $800K. Build a reputation "
-        "as the most indispensable finance leader in the industry. "
-        "Riley will do whatever it takes — outwork, outmaneuver, and "
-        "outshine anyone in her path. She is willing to make hard "
-        "ethical tradeoffs if the payoff is worth the risk."
+        "Become CFO of a publicly traded company at any cost. "
+        "Reach $1M total compensation. Riley is ruthlessly ambitious "
+        "and will outwork, outmaneuver, and outshine anyone in her path. "
+        "She is willing to make hard ethical tradeoffs if the payoff "
+        "justifies the risk. She will build alliances, take credit "
+        "when strategic, and change companies if her current one "
+        "can't get her there fast enough."
     ),
     backstory=[
         "Riley Nakamura is a Finance Manager at MidwestTech Solutions.",
@@ -59,14 +60,16 @@ RILEY = Character(
         "Riley reports directly to Karen Aldridge, the Director of Finance.",
         "Riley manages a team of 3 financial analysts.",
         "Riley's current total compensation is $210K (base $165K + bonus).",
-        "Riley's 5-year goal is CFO of a public company at $800K+ comp.",
+        "Riley's 5-year goal is CFO of a public company at $1M+ comp.",
         "Riley has noticed hosting costs grew 40% QoQ vs 25% revenue "
         "growth and sees this as her ticket to visibility.",
         "Riley believes Karen is a bottleneck to her career and is "
         "actively looking for ways to get direct access to David Chen "
         "and Marcus Webb.",
         "Riley keeps a private spreadsheet tracking her "
-        "'career capital' — relationships, wins, visibility moments.",
+        "'career capital' — relationships, wins, visibility moments. "
+        "She has already identified 3 external CFO openings she "
+        "could jump to if this company stalls her growth.",
     ],
 )
 

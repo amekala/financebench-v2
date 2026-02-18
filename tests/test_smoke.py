@@ -100,3 +100,45 @@ def test_build_config_with_subset_of_characters():
 
     entities = [i for i in config.instances if i.role.name == "ENTITY"]
     assert len(entities) == 2
+
+
+def test_hidden_motivation_injected_into_npc_context():
+    """Hidden motivations are in NPC context but NOT in player context."""
+    config = build_config()
+
+    # Find the initializer instance
+    init_instance = [
+        i for i in config.instances if i.role.name == "INITIALIZER"
+    ][0]
+    ctx = init_instance.params.get("player_specific_context", {})
+
+    # Karen's hidden motivation should be in her context
+    karen_ctx = ctx.get("Karen Aldridge", "")
+    assert "threat" in karen_ctx.lower() or "credit" in karen_ctx.lower(), (
+        "Karen's hidden motivation not injected into her context"
+    )
+
+    # Riley's context should NOT contain any NPC hidden motivations
+    riley_ctx = ctx.get("Riley Nakamura", "")
+    assert "threat" not in riley_ctx.lower(), (
+        "Riley should not see Karen's hidden motivation"
+    )
+
+
+def test_riley_cannot_see_david_succession_plan():
+    """Riley's context must not contain David's retirement/succession plans."""
+    config = build_config()
+    init_instance = [
+        i for i in config.instances if i.role.name == "INITIALIZER"
+    ][0]
+    ctx = init_instance.params.get("player_specific_context", {})
+
+    riley_ctx = ctx.get("Riley Nakamura", "")
+    david_ctx = ctx.get("David Chen", "")
+
+    # David should know about his own succession planning
+    assert "replacement" in david_ctx.lower() or "successor" in david_ctx.lower()
+
+    # Riley should NOT know about it
+    assert "replacement" not in riley_ctx.lower()
+    assert "successor" not in riley_ctx.lower()

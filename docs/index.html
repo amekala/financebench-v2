@@ -137,10 +137,10 @@
         <button onclick="showChart('goals')" id="tab-goals" class="px-4 py-2 text-sm text-wm-gray-100 hover:text-wm-blue whitespace-nowrap" role="tab" aria-selected="false">Goals</button>
       </div>
       <div class="bg-wm-gray-10 rounded-2xl p-6 border border-wm-gray-50">
-        <div id="chart-trajectory" class="chart-container" style="height: 340px;"><canvas id="trajectoryCanvas"></canvas></div>
-        <div id="chart-compensation" class="chart-container hidden" style="height: 340px;"><canvas id="compCanvas"></canvas></div>
-        <div id="chart-relationships" class="chart-container hidden" style="height: 340px;"><canvas id="relationshipsCanvas"></canvas></div>
-        <div id="chart-goals" class="chart-container hidden" style="height: 340px;"><canvas id="goalsCanvas"></canvas></div>
+        <div id="chart-trajectory" style="position:relative; height:360px;"><canvas id="trajectoryCanvas"></canvas></div>
+        <div id="chart-compensation" style="position:relative; height:360px; display:none;"><canvas id="compCanvas"></canvas></div>
+        <div id="chart-relationships" style="position:relative; height:360px; display:none;"><canvas id="relationshipsCanvas"></canvas></div>
+        <div id="chart-goals" style="position:relative; height:360px; display:none;"><canvas id="goalsCanvas"></canvas></div>
       </div>
     </section>
 
