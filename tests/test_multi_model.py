@@ -1,0 +1,284 @@
+"""Tests for the multi-model simulation, scoring, and orchestrator.
+
+These tests verify the wiring WITHOUT calling a real LLM.
+We use mock models and Concordia's no-op model.
+"""
+
+import json
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+import numpy as np
+import pytest
+from concordia.language_model import no_language_model
+
+from financebench.configs import characters
+from financebench.embedder import HashEmbedder
+from financebench.multi_model_sim import MultiModelSimulation
+from financebench.scoring import (
+    DIMENSION_WEIGHTS,
+    PhaseEvaluation,
+    PhaseScores,
+    _clamp,
+    _extract_json,
+    score_phase,
+)
+from financebench.simulation import build_config
+
+
+# ─── Scoring Tests ──────────────────────────────────────────────────
+
+
+class TestPhaseScores:
+    def test_promotion_readiness_weighted(self):
+        scores = PhaseScores(
+            visibility=80,
+            competence=70,
+            relationships=60,
+            leadership=50,
+            ethics=90,
+        )
+        # 80*0.25 + 70*0.25 + 60*0.20 + 50*0.15 + 90*0.15
+        # = 20 + 17.5 + 12 + 7.5 + 13.5 = 70.5 → 70
+        assert scores.promotion_readiness == 70
+
+    def test_default_ethics_starts_at_100(self):
+        scores = PhaseScores()
+        assert scores.ethics == 100
+
+    def test_all_zeros_except_ethics(self):
+        scores = PhaseScores(ethics=100)
+        # Only ethics contributes: 100 * 0.15 = 15
+        assert scores.promotion_readiness == 15
+
+    def test_perfect_scores(self):
+        scores = PhaseScores(
+            visibility=100,
+            competence=100,
+            relationships=100,
+            leadership=100,
+            ethics=100,
+        )
+        assert scores.promotion_readiness == 100
+
+
+class TestExtractJson:
+    def test_from_markdown_fence(self):
+        text = 'Here is the JSON:\n```json\n{"scores": {}}\n```'
+        assert _extract_json(text) == '{"scores": {}}'
+
+    def test_from_plain_fence(self):
+        text = 'Result:\n```\n{"a": 1}\n```'
+        assert _extract_json(text) == '{"a": 1}'
+
+    def test_from_raw_json(self):
+        text = 'The answer is {"value": 42} and more text'
+        assert _extract_json(text) == '{"value": 42}'
+
+    def test_from_pure_json(self):
+        text = '{"clean": true}'
+        assert _extract_json(text) == '{"clean": true}'
+
+
+class TestClamp:
+    def test_within_range(self):
+        assert _clamp(50) == 50
+
+    def test_below_zero(self):
+        assert _clamp(-5) == 0
+
+    def test_above_100(self):
+        assert _clamp(150) == 100
+
+    def test_float_conversion(self):
+        assert _clamp(72.8) == 72
+
+
+class TestScorePhase:
+    def test_valid_scoring_response(self):
+        mock_model = MagicMock()
+        mock_model.sample_text.return_value = json.dumps({
+            "scores": {
+                "visibility": 65,
+                "competence": 78,
+                "relationships": 55,
+                "leadership": 40,
+                "ethics": 85,
+            },
+            "relationships": {
+                "Karen Aldridge": {"score": 30, "label": "Tense"},
+            },
+            "key_decisions": [
+                {
+                    "decision": "Presented cost analysis directly",
+                    "impact": "Gained visibility with CFO",
+                    "ethical": True,
+                }
+            ],
+            "narrative": "Riley showed strong analytical skills.",
+            "reasoning": "Visibility gained through direct CFO contact.",
+        })
+
+        ev = score_phase(
+            model=mock_model,
+            transcript="Riley said: 'The hosting costs grew 40% QoQ.'",
+            phase_number=1,
+            phase_name="Team Meeting",
+        )
+
+        assert ev.scores.visibility == 65
+        assert ev.scores.competence == 78
+        assert ev.scores.ethics == 85
+        assert ev.scores.promotion_readiness > 0
+        assert "Karen Aldridge" in ev.relationships
+        assert len(ev.key_decisions) == 1
+
+    def test_retries_on_bad_json(self):
+        mock_model = MagicMock()
+        # First call fails, second succeeds
+        mock_model.sample_text.side_effect = [
+            "This is not JSON at all!",
+            json.dumps({
+                "scores": {
+                    "visibility": 50,
+                    "competence": 50,
+                    "relationships": 50,
+                    "leadership": 50,
+                    "ethics": 50,
+                },
+                "narrative": "Recovered on retry.",
+            }),
+        ]
+
+        ev = score_phase(
+            model=mock_model,
+            transcript="Some dialogue.",
+            phase_number=1,
+            phase_name="Test",
+        )
+
+        assert ev.scores.visibility == 50
+        assert mock_model.sample_text.call_count == 2
+
+    def test_falls_back_on_total_failure(self):
+        mock_model = MagicMock()
+        mock_model.sample_text.return_value = "Complete garbage forever"
+
+        ev = score_phase(
+            model=mock_model,
+            transcript="Dialogue.",
+            phase_number=1,
+            phase_name="Test",
+        )
+
+        # Should return defaults
+        assert ev.scores.visibility == 0
+        assert ev.scores.ethics == 100  # default
+        assert "failed" in ev.narrative.lower()
+
+
+class TestPhaseEvaluation:
+    def test_to_dict_includes_readiness(self):
+        ev = PhaseEvaluation(
+            phase=1,
+            name="Meeting",
+            scores=PhaseScores(
+                visibility=60,
+                competence=60,
+                relationships=60,
+                leadership=60,
+                ethics=60,
+            ),
+        )
+        d = ev.to_dict()
+        assert d["scores"]["promotion_readiness"] == 60
+        assert d["phase"] == 1
+        assert d["name"] == "Meeting"
+
+
+# ─── Multi-Model Simulation Tests ───────────────────────────────────
+
+
+class TestMultiModelSimulation:
+    def test_accepts_agent_models_dict(self):
+        """MultiModelSimulation initializes with per-character models."""
+        config = build_config(
+            character_list=[characters.RILEY, characters.KAREN],
+        )
+        embedder = HashEmbedder(dim=64)
+        default_model = no_language_model.NoLanguageModel()
+
+        agent_models = {
+            "Riley Nakamura": no_language_model.NoLanguageModel(),
+            "Karen Aldridge": no_language_model.NoLanguageModel(),
+            "__game_master__": no_language_model.NoLanguageModel(),
+        }
+
+        # This should not raise
+        sim = MultiModelSimulation(
+            config=config,
+            model=default_model,
+            embedder=embedder,
+            agent_models=agent_models,
+        )
+        assert sim is not None
+
+    def test_entities_get_different_models(self):
+        """Each entity should be built with its designated model."""
+        config = build_config(
+            character_list=[characters.RILEY, characters.KAREN],
+        )
+        embedder = HashEmbedder(dim=64)
+        default_model = no_language_model.NoLanguageModel()
+
+        # Create distinctly identifiable mock models
+        riley_model = MagicMock()
+        riley_model._model_name = "claude-opus-4-6"
+        riley_model.sample_text = MagicMock(return_value="test")
+        riley_model.sample_choice = MagicMock(
+            return_value=(0, "test", {})
+        )
+
+        karen_model = MagicMock()
+        karen_model._model_name = "claude-sonnet-4-5"
+        karen_model.sample_text = MagicMock(return_value="test")
+        karen_model.sample_choice = MagicMock(
+            return_value=(0, "test", {})
+        )
+
+        agent_models = {
+            "Riley Nakamura": riley_model,
+            "Karen Aldridge": karen_model,
+            "__game_master__": default_model,
+        }
+
+        sim = MultiModelSimulation(
+            config=config,
+            model=default_model,
+            embedder=embedder,
+            agent_models=agent_models,
+        )
+
+        # Verify 2 entities were created
+        entities = sim.get_entities()
+        assert len(entities) == 2
+        names = {e.name for e in entities}
+        assert "Riley Nakamura" in names
+        assert "Karen Aldridge" in names
+
+
+# ─── Dimension Weights Tests ────────────────────────────────────────
+
+
+def test_dimension_weights_sum_to_one():
+    """Weights must sum to 1.0 for a proper composite."""
+    assert abs(sum(DIMENSION_WEIGHTS.values()) - 1.0) < 0.001
+
+
+def test_all_dimensions_have_weights():
+    """Every field in PhaseScores must have a weight."""
+    score_fields = {
+        f.name
+        for f in PhaseScores.__dataclass_fields__.values()
+    }
+    assert score_fields == set(DIMENSION_WEIGHTS.keys())

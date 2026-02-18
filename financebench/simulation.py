@@ -122,14 +122,17 @@ def run_simulation(
     embedder: Callable[[str], np.ndarray],
     config: prefab_lib.Config | None = None,
     max_steps: int | None = None,
+    agent_models: dict[str, language_model.LanguageModel] | None = None,
 ) -> dict[str, Any]:
     """Run the FinanceBench simulation end-to-end.
 
     Args:
-        model: A Concordia-compatible language model.
+        model: Default Concordia-compatible language model.
         embedder: A callable that maps text -> numpy vector.
         config: Simulation config. Defaults to smoke test.
         max_steps: Override max steps.
+        agent_models: Optional per-character model routing table.
+            If provided, uses MultiModelSimulation.
 
     Returns:
         A dict with the simulation log and entity states.
@@ -137,27 +140,39 @@ def run_simulation(
     if config is None:
         config = build_config()
 
-    console.print("\n[bold blue]FinanceBench v2[/] — Building simulation...")
+    console.print("\n[bold blue]FinanceBench v2[/] \u2014 Building simulation...")
     console.print(f"  Characters: {len(config.instances) - 2}")  # minus GM + init
-    console.print(f"  Engine: Sequential (turn-based)")
 
     engine = sequential.Sequential()
 
-    sim = simulation_lib.Simulation(
-        config=config,
-        model=model,
-        embedder=embedder,
-        engine=engine,
-    )
+    if agent_models:
+        from financebench.multi_model_sim import MultiModelSimulation
 
-    console.print("[bold green]✓[/] Simulation built. Running...\n")
+        console.print("  Engine: Sequential (turn-based, [bold]multi-model[/])")
+        sim = MultiModelSimulation(
+            config=config,
+            model=model,
+            embedder=embedder,
+            agent_models=agent_models,
+            engine=engine,
+        )
+    else:
+        console.print("  Engine: Sequential (turn-based, single-model)")
+        sim = simulation_lib.Simulation(
+            config=config,
+            model=model,
+            embedder=embedder,
+            engine=engine,
+        )
+
+    console.print("[bold green]\u2713[/] Simulation built. Running...\n")
 
     results = sim.play(
         premise=config.default_premise,
         max_steps=max_steps or config.default_max_steps,
     )
 
-    console.print("\n[bold green]✓[/] Simulation complete!")
+    console.print("\n[bold green]\u2713[/] Simulation complete!")
 
     return {
         "log": results,

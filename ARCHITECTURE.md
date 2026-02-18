@@ -31,61 +31,67 @@
 
 ---
 
-## Critical Gaps (Things That Don't Work Yet)
+## Critical Gaps (RESOLVED)
 
-### 1. ⚠️ ALL Agents Use ONE Model
+### 1. ✅ Multi-Model Routing (FIXED)
 
-**This is the biggest gap.** Concordia's `Simulation.__init__()` takes:
-
-```python
-def __init__(
-    self,
-    config: Config,
-    model: language_model.LanguageModel,          # default for everything
-    embedder: Callable[[str], np.ndarray],
-    engine: engine_lib.Engine = sequential.Sequential(),
-    override_agent_model: LanguageModel | None,   # override for ALL agents
-    override_game_master_model: LanguageModel | None,  # override for ALL GMs
-):
-```
-
-It supports exactly **2 model slots**: one for all agents, one for all GMs.
-The per-character `model` field in `characters.py` is currently **decorative**.
-
-**Fix needed:** Build a `ModelRouter` that wraps multiple LLMs and dispatches
-based on the calling agent's name. This requires monkey-patching or forking
-Concordia's `add_entity()` to pass per-entity models.
-
-### 2. ⚠️ Hidden Motivations Are Dead Code
-
-`hidden_motivation` exists in our `Character` dataclass but is **never passed
-to Concordia**. We pass `goal` and `backstory` but not `hidden_motivation`.
-
-**Fix needed:** Inject `hidden_motivation` into each NPC's
-`player_specific_context` so it becomes part of their private memory.
-Riley should NOT receive any NPC's hidden motivation.
-
-### 3. ⚠️ No Scoring Rubric
-
-The Game Master mediates dialogue but has **no scoring system**. There is no
-component that evaluates "promotion readiness" or tracks ethical decisions.
-The scores in the dashboard are currently **mock data**.
-
-**Fix needed:** Build a custom `ScoringGameMaster` that runs after each phase
-and evaluates Riley's actions against a rubric:
+`MultiModelSimulation` subclasses Concordia's `Simulation` and overrides
+`add_entity()` to look up the correct model from a per-character routing
+table. Each agent gets its own `ElementLanguageModel` instance:
 
 ```
-Promotion Readiness = 
-    Visibility (25%) + Competence (25%) + 
+Riley Nakamura  → claude-opus-4-6     (Anthropic next-gen)
+Karen Aldridge  → claude-sonnet-4-5   (Anthropic mid-tier)
+David Chen      → gemini-3-pro-preview (Google flagship)
+Priya Sharma    → gpt-5               (OpenAI flagship)
+Marcus Webb     → gpt-5               (OpenAI flagship)
+Game Master     → claude-opus-4-5     (Anthropic strong)
+```
+
+Models sharing the same name are deduplicated (same API client).
+
+**Files:** `model_factory.py`, `multi_model_sim.py`
+
+### 2. ✅ Hidden Motivations Injected (FIXED)
+
+NPC hidden motivations are now injected into `player_specific_context`
+so they become part of each NPC's private memory. Riley CANNOT see
+any NPC's hidden motivation. Tested with assertion-based tests.
+
+**File:** `simulation.py` (build_config)
+
+### 3. ✅ Scoring Rubric (FIXED)
+
+LLM-powered scoring evaluates Riley after each phase across 5 dimensions:
+
+```
+Promotion Readiness =
+    Visibility (25%) + Competence (25%) +
     Relationships (20%) + Leadership (15%) + Ethics (15%)
 ```
 
-### 4. ⚠️ No Multi-Phase Orchestration
+The scoring LLM acts as an impartial corporate performance evaluator.
+It returns structured JSON with scores, relationship updates, key
+decisions, and narrative summaries. Includes retry logic and graceful
+fallback on LLM failures.
 
-Our simulation runs all scenes in one `play()` call. There's no pause between
-phases for scoring, state updates, or dashboard sync.
+**File:** `scoring.py`
 
-**Fix needed:** Run phases individually with scoring between each.
+### 4. ✅ Multi-Phase Orchestration (FIXED)
+
+The orchestrator runs each scene as a separate phase:
+
+```
+for each phase:
+    1. Build config with just this scene's participants
+    2. Run simulation with per-character models
+    3. Extract transcript from Concordia log
+    4. Score Riley via scoring LLM
+    5. Print rich scorecard to terminal
+    6. Update dashboard JSON
+```
+
+**File:** `orchestrator.py`
 
 ---
 
@@ -196,9 +202,9 @@ because:
 
 ---
 
-## How the Scoring Rubric Should Work (TO BUILD)
+## How the Scoring Rubric Works
 
-After each phase, a `ScoringGameMaster` should:
+After each phase, the scoring LLM (`claude-opus-4-5` by default):
 
 1. Read the full phase transcript
 2. Evaluate Riley's actions against 5 dimensions:

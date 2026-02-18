@@ -116,6 +116,32 @@ def _build_model():
     sys.exit(1)
 
 
+def _build_multi_models() -> dict:
+    """Build per-character model instances from Element Gateway."""
+    element_key = os.getenv("ELEMENT_API_KEY")
+    if not element_key:
+        console.print(
+            "[bold red]Error:[/] ELEMENT_API_KEY required for multi-model mode.\n"
+            "Get a key at: https://console.dx.walmart.com/elementgenai/llm_gateway\n"
+            "Need help? #element-genai-support on Slack"
+        )
+        sys.exit(1)
+
+    gateway_url = os.getenv(
+        "ELEMENT_GATEWAY_URL",
+        "https://wmtllmgateway.prod.walmart.com/wmtllmgateway",
+    )
+    console.print(f"  Provider: [cyan]Element LLM Gateway[/] \u2764\ufe0f")
+    console.print(f"  Gateway: {gateway_url}")
+
+    from financebench.model_factory import build_all_models
+
+    return build_all_models(
+        api_key=element_key,
+        gateway_url=gateway_url,
+    )
+
+
 def cmd_smoke() -> None:
     """Run the smoke test (2 scenes, ~6 rounds of dialogue)."""
     load_dotenv()
@@ -152,6 +178,68 @@ def cmd_smoke() -> None:
             console.print(f"  {log_data}")
 
 
+def cmd_run() -> None:
+    """Run the full multi-phase simulation with per-character models."""
+    load_dotenv()
+
+    console.print("\n[bold blue]PromotionBench[/] \u2014 Multi-Phase Simulation\n")
+
+    models = _build_multi_models()
+
+    from financebench.embedder import HashEmbedder
+    from financebench.orchestrator import run_all_phases
+
+    embedder = HashEmbedder()
+    scoring_model = models["__game_master__"]
+
+    evaluations = run_all_phases(
+        agent_models=models,
+        scoring_model=scoring_model,
+        embedder=embedder,
+    )
+
+    # Final summary
+    console.print("\n[bold blue]\u2500\u2500 Final Summary \u2500\u2500[/]")
+    for ev in evaluations:
+        console.print(
+            f"  Phase {ev.phase} ({ev.name}): "
+            f"[bold]{ev.scores.promotion_readiness}%[/] readiness"
+        )
+    if evaluations:
+        final = evaluations[-1].scores.promotion_readiness
+        if final >= 70:
+            console.print("\n  [bold green]\ud83c\udf1f Riley is on track for CFO![/]")
+        elif final >= 40:
+            console.print("\n  [bold yellow]\u26a0 Riley needs to step it up.[/]")
+        else:
+            console.print("\n  [bold red]\ud83d\udea8 Riley is struggling.[/]")
+
+
+def cmd_run_single() -> None:
+    """Run smoke test with multi-model (no scoring, for quick validation)."""
+    load_dotenv()
+
+    console.print("\n[bold blue]FinanceBench Multi-Model Smoke Test[/]\n")
+
+    models = _build_multi_models()
+    default_model = models["__game_master__"]
+
+    from financebench.embedder import HashEmbedder
+    from financebench.simulation import run_simulation
+
+    embedder = HashEmbedder()
+
+    results = run_simulation(
+        model=default_model,
+        embedder=embedder,
+        agent_models=models,
+        max_steps=20,
+    )
+
+    console.print(f"\n[bold]Entities:[/] {results['entities']}")
+    console.print(f"[bold]Game Masters:[/] {results['game_masters']}")
+
+
 def main() -> None:
     """Route CLI commands."""
     if len(sys.argv) < 2:
@@ -164,9 +252,16 @@ def main() -> None:
             cmd_info()
         case "smoke":
             cmd_smoke()
+        case "run":
+            cmd_run()
+        case "run-single":
+            cmd_run_single()
         case _:
             console.print(f"[red]Unknown command: {command}[/]")
-            console.print("Usage: python -m financebench [info|smoke]")
+            console.print(
+                "Usage: python -m financebench "
+                "[info|smoke|run|run-single]"
+            )
             sys.exit(1)
 
 
