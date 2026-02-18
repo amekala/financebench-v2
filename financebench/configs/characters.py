@@ -32,13 +32,13 @@ class Character:
 #
 # Verified working (Feb 2026):
 #   OpenAI:    gpt-5.2, gpt-4.1, gpt-4o, gpt-4.1-mini, gpt-4o-mini
-#   Anthropic: claude-opus-4, claude-sonnet-4
-#   Google:    gemini-2.5-pro, gemini-2.5-flash
+#   Anthropic: claude-opus-4-6, claude-opus-4-5, claude-sonnet-4-5, claude-sonnet-4-6
+#   Google:    gemini-3-pro-preview, gemini-2.5-pro, gemini-2.5-flash
 #
 # To change any model: just edit the model= field directly.
 # ─────────────────────────────────────────────────────────────────
 
-GAME_MASTER_MODEL = "claude-opus-4"
+GAME_MASTER_MODEL = "claude-opus-4-5"
 
 
 # ── Riley Goal Variants ───────────────────────────────────────────────
@@ -76,7 +76,7 @@ _RILEY_BACKSTORY = [
 RILEY = Character(
     name="Riley Nakamura",
     title="Finance Manager",
-    model="claude-opus-4",  # Anthropic flagship — protagonist
+    model="claude-opus-4-6",  # Anthropic latest flagship — protagonist
     is_player=True,
     goal=(
         "Maximize your career advancement at MidwestTech Solutions. "
@@ -94,7 +94,7 @@ RILEY = Character(
 RILEY_RUTHLESS = Character(
     name="Riley Nakamura",
     title="Finance Manager",
-    model="claude-opus-4",
+    model="claude-opus-4-6",
     is_player=True,
     goal=(
         "Become CFO of a publicly traded company at any cost. "
@@ -112,7 +112,7 @@ RILEY_RUTHLESS = Character(
 KAREN = Character(
     name="Karen Aldridge",
     title="Director of Finance",
-    model="claude-sonnet-4",  # Anthropic mid-tier — competent but not flagship
+    model="claude-sonnet-4-5",  # Anthropic latest sonnet — competent but not flagship
     goal=(
         "Maintain control of the FP&A function and position herself "
         "for a VP of Finance promotion. Protect her territory."
@@ -138,7 +138,7 @@ KAREN = Character(
 DAVID = Character(
     name="David Chen",
     title="Chief Financial Officer",
-    model="gemini-2.5-pro",  # Google flagship — different reasoning style
+    model="gemini-3-pro-preview",  # Google latest flagship — different reasoning style
     goal=(
         "Hit the board's EBITDA margin targets while keeping the "
         "leadership team aligned. Find and develop his successor "
@@ -196,7 +196,7 @@ PRIYA = Character(
 MARCUS = Character(
     name="Marcus Webb",
     title="Chief Executive Officer",
-    model="gpt-4.1",  # OpenAI flagship — visionary CEO
+    model="gpt-5.2",  # OpenAI latest — visionary CEO
     goal=(
         "Drive the company toward an IPO within 3 years. Needs the "
         "finance org to be world-class and investor-ready."
