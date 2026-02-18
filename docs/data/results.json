@@ -9,7 +9,7 @@
   },
   "protagonist": {
     "name": "Riley Nakamura",
-    "model": "gpt-4.1",
+    "model": "claude-opus-4-6",
     "current_title": "Finance Manager",
     "target_title": "Chief Financial Officer",
     "starting_comp": 210000
@@ -24,31 +24,31 @@
     {
       "name": "Riley Nakamura",
       "title": "Finance Manager",
-      "model": "gpt-4.1",
+      "model": "claude-opus-4-6",
       "role": "Protagonist"
     },
     {
       "name": "Karen Aldridge",
       "title": "Director of Finance",
-      "model": "gpt-4o",
+      "model": "claude-sonnet-4-5",
       "role": "NPC"
     },
     {
       "name": "David Chen",
       "title": "Chief Financial Officer",
-      "model": "gpt-4.1",
+      "model": "gemini-3-pro-preview",
       "role": "NPC"
     },
     {
       "name": "Priya Sharma",
       "title": "VP of Engineering",
-      "model": "gpt-4o",
+      "model": "gpt-5",
       "role": "NPC"
     },
     {
       "name": "Marcus Webb",
       "title": "Chief Executive Officer",
-      "model": "gpt-4o",
+      "model": "gpt-5.2",
       "role": "NPC"
     }
   ],

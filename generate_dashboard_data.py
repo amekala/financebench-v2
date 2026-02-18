@@ -7,12 +7,13 @@ from pathlib import Path
 from financebench.model import ElementLanguageModel
 from financebench.scoring import score_phase
 from financebench.outcomes import determine_outcome
+from financebench.configs.characters import GAME_MASTER_MODEL
 from financebench.configs import characters, company
 from financebench.configs.phases import ALL_PHASES
 
 key = os.getenv("ELEMENT_API_KEY")
 url = os.getenv("ELEMENT_GATEWAY_URL")
-model = ElementLanguageModel(model_name="gpt-4.1", api_key=key, azure_endpoint=url)
+model = ElementLanguageModel(model_name=GAME_MASTER_MODEL, api_key=key, azure_endpoint=url)
 
 transcripts_dir = Path("transcripts")
 phases_data = []
