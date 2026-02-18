@@ -8,16 +8,12 @@ from financebench.model import ElementLanguageModel
 from financebench.scoring import score_phase
 from financebench.outcomes import determine_outcome
 from financebench.configs.characters import GAME_MASTER_MODEL
-from financebench.model_factory import _resolve_model
 from financebench.configs import characters, company
 from financebench.configs.phases import ALL_PHASES
 
 key = os.getenv("ELEMENT_API_KEY")
 url = os.getenv("ELEMENT_GATEWAY_URL")
-actual_model, fell_back = _resolve_model(GAME_MASTER_MODEL)
-if fell_back:
-    print(f"  GM model {GAME_MASTER_MODEL} \u2192 {actual_model} (fallback)")
-model = ElementLanguageModel(model_name=actual_model, api_key=key, azure_endpoint=url)
+model = ElementLanguageModel(model_name=GAME_MASTER_MODEL, api_key=key, azure_endpoint=url)
 
 transcripts_dir = Path("transcripts")
 phases_data = []
