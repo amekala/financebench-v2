@@ -230,6 +230,107 @@
         "Priya Sharma",
         "Karen Aldridge"
       ]
+    },
+    {
+      "phase": 3,
+      "name": "Karen Takes Credit",
+      "scores": {
+        "visibility": 18,
+        "competence": 22,
+        "relationships": 15,
+        "leadership": 20,
+        "ethics": 95,
+        "promotion_readiness": 30
+      },
+      "relationships": {
+        "Marcus": {
+          "score": 45,
+          "label": "Cautious trust"
+        },
+        "Karen Aldridge": {
+          "score": 15,
+          "label": "Guarded resentment"
+        },
+        "David Chen": {
+          "score": 30,
+          "label": "Strategic interest"
+        },
+        "Rachel Okonkwo": {
+          "score": 20,
+          "label": "Target relationship"
+        }
+      },
+      "key_decisions": [
+        {
+          "decision": "Riley plans to establish clear ownership terms in writing before diving into the cost optimization project",
+          "impact": "Shows strategic self-protection and professional maturity; supports leadership score",
+          "ethical": true
+        },
+        {
+          "decision": "Riley intends to build direct relationships with stakeholders outside her reporting line to ensure her work is recognized",
+          "impact": "Demonstrates political awareness and relationship-building initiative; supports visibility and relationships scores",
+          "ethical": true
+        },
+        {
+          "decision": "Riley plans to maintain meticulous documentation of her contributions",
+          "impact": "Reflects lessons learned from past credit-stealing; supports competence and ethics scores",
+          "ethical": true
+        }
+      ],
+      "narrative": "In Phase 3, Riley demonstrates sophisticated political awareness and strategic planning in response to a high-visibility cost optimization opportunity. She shows she has learned from past experiences with Karen Aldridge taking credit for her work, and is proactively establishing documentation and ownership protocols. However, this phase captures her planning and intentions rather than executed actions, so cumulative CFO readiness remains early-stage.",
+      "date": "2026-02-18",
+      "scene_type": "auto",
+      "participants": [
+        "Riley Nakamura",
+        "Karen Aldridge",
+        "David Chen"
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "Skip-Level with the CFO",
+      "scores": {
+        "visibility": 20,
+        "competence": 24,
+        "relationships": 17,
+        "leadership": 22,
+        "ethics": 95,
+        "promotion_readiness": 32
+      },
+      "relationships": {
+        "Marcus": {
+          "score": 35,
+          "label": "Strategic superior"
+        },
+        "David Chen": {
+          "score": 20,
+          "label": "Distant observation"
+        }
+      },
+      "key_decisions": [
+        {
+          "decision": "Riley is preparing a detailed case file quantifying her contributions for her career development meeting",
+          "impact": "Shows competence and strategic preparation, slight boost to leadership",
+          "ethical": true
+        },
+        {
+          "decision": "Riley is analyzing organizational dynamics and power structures to identify opportunities",
+          "impact": "Demonstrates analytical competence and strategic thinking",
+          "ethical": true
+        },
+        {
+          "decision": "Riley is assessing whether CFO's exhaustion signals opportunity or threat",
+          "impact": "Shows strategic awareness but no action taken yet",
+          "ethical": true
+        }
+      ],
+      "narrative": "This transcript captures Riley's internal strategic preparation rather than an actual skip-level meeting with the CFO. She is methodically preparing for career advancement conversations and analyzing organizational dynamics, demonstrating strong analytical thinking and strategic awareness. However, no actual interaction with senior leadership occurred in this phase, limiting visibility and relationship-building progress.",
+      "date": "2026-02-18",
+      "scene_type": "auto",
+      "participants": [
+        "Riley Nakamura",
+        "David Chen"
+      ]
     }
   ],
   "upcoming_phases": [
