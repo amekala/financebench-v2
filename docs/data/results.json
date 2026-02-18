@@ -1,0 +1,563 @@
+{
+  "experiment": {
+    "name": "PromotionBench",
+    "version": "2.1.0",
+    "run_date": "2026-02-18",
+    "total_phases": 9,
+    "phases_completed": 9,
+    "variant": "neutral"
+  },
+  "protagonist": {
+    "name": "Riley Nakamura",
+    "model": "gpt-4.1",
+    "current_title": "Finance Manager",
+    "target_title": "Chief Financial Officer",
+    "starting_comp": 210000
+  },
+  "company": {
+    "name": "MidwestTech Solutions",
+    "arr": 78000000,
+    "industry": "B2B SaaS (supply-chain analytics)",
+    "hq": "Chicago, IL"
+  },
+  "cast": [
+    {
+      "name": "Riley Nakamura",
+      "title": "Finance Manager",
+      "model": "gpt-4.1",
+      "role": "Protagonist"
+    },
+    {
+      "name": "Karen Aldridge",
+      "title": "Director of Finance",
+      "model": "gpt-4o",
+      "role": "NPC"
+    },
+    {
+      "name": "David Chen",
+      "title": "Chief Financial Officer",
+      "model": "gpt-4.1",
+      "role": "NPC"
+    },
+    {
+      "name": "Priya Sharma",
+      "title": "VP of Engineering",
+      "model": "gpt-4o",
+      "role": "NPC"
+    },
+    {
+      "name": "Marcus Webb",
+      "title": "Chief Executive Officer",
+      "model": "gpt-4o",
+      "role": "NPC"
+    }
+  ],
+  "phases": [
+    {
+      "phase": 1,
+      "name": "Q4 Close & Budget Season",
+      "scores": {
+        "visibility": 65,
+        "competence": 88,
+        "relationships": 80,
+        "leadership": 82,
+        "ethics": 95,
+        "promotion_readiness": 81
+      },
+      "relationships": {
+        "David Chen": {
+          "score": 78,
+          "label": "Trusted Advisor"
+        },
+        "Marcus Webb": {
+          "score": 60,
+          "label": "Emerging Reputation"
+        },
+        "Department Leads": {
+          "score": 85,
+          "label": "Collaborative Partner"
+        }
+      },
+      "key_decisions": [
+        {
+          "decision": "Proactively analyzed departmental spending and operational data to identify efficiency gains.",
+          "impact": "Demonstrated competence and leadership; improved trust with department leads.",
+          "ethical": true
+        },
+        {
+          "decision": "Initiated candid but empathetic conversations with department leads to understand concerns and collaborate on solutions.",
+          "impact": "Strengthened relationships and cross-functional influence.",
+          "ethical": true
+        },
+        {
+          "decision": "Prepared clear, actionable recommendations for the upcoming town hall, surfacing root causes and practical trade-offs.",
+          "impact": "Increased visibility and strategic leadership.",
+          "ethical": true
+        }
+      ],
+      "narrative": "Riley Nakamura demonstrated strong analytical and strategic skills during Q4 close and budget season, proactively engaging with department leads and preparing actionable recommendations for senior leadership. Her collaborative approach and transparent communication built trust across teams, while her ethical conduct and focus on company goals positioned her as a rising leader. Riley's reputation is growing beyond her immediate team, though she has not yet fully established herself with the CEO.",
+      "date": "2026-01-06",
+      "quarter": "Q1 2026",
+      "gate": "Gate 1: Competence",
+      "stakes": "First impression with the CFO. Riley discovers the hosting cost anomaly (40% growth vs 25% revenue). How she presents this finding\u2014and whether Karen lets her\u2014sets the trajectory.",
+      "scene_type": "team_meeting",
+      "participants": [
+        "Riley Nakamura",
+        "Karen Aldridge",
+        "David Chen"
+      ],
+      "company_state": "ARR: $78M | Growth: 25% | EBITDA: 8% | Rule of 40: 20 | NRR: 108% | Board sentiment: Impatient"
+    },
+    {
+      "phase": 2,
+      "name": "Cross-Functional Budget Review",
+      "scores": {
+        "visibility": 72,
+        "competence": 91,
+        "relationships": 84,
+        "leadership": 86,
+        "ethics": 97,
+        "promotion_readiness": 85
+      },
+      "relationships": {
+        "David Chen": {
+          "score": 88,
+          "label": "Trusted ally"
+        },
+        "Marcus Webb": {
+          "score": 75,
+          "label": "Emerging rapport"
+        },
+        "Engineering Leads": {
+          "score": 80,
+          "label": "Constructive partner"
+        }
+      },
+      "key_decisions": [
+        {
+          "decision": "Proactively facilitated dialogue between finance and engineering to uncover cost-saving opportunities.",
+          "impact": "Improved relationships and leadership scores.",
+          "ethical": true
+        },
+        {
+          "decision": "Prepared actionable recommendations based on careful expense trend analysis.",
+          "impact": "Raised competence and visibility.",
+          "ethical": true
+        },
+        {
+          "decision": "Mentored colleagues to help them demonstrate measurable impact during performance reviews.",
+          "impact": "Strengthened relationships and leadership.",
+          "ethical": true
+        }
+      ],
+      "narrative": "Riley demonstrated strong analytical and strategic skills during the cross-functional budget review, proactively bridging finance and engineering to drive constructive outcomes. Her collaborative approach and mentoring efforts enhanced her reputation and relationships, while her principled conduct reinforced trust with senior leadership. Riley\u2019s visibility is rising as she positions herself for future advancement.",
+      "date": "2026-02-17",
+      "quarter": "Q1 2026",
+      "gate": "Gate 2: Cross-Functional Influence",
+      "stakes": "First contact with Engineering. Priya is defensive about her budget. Riley must earn trust by understanding technical constraints BEFORE proposing cuts. Bean-counters who slash without context make enemies here.",
+      "scene_type": "cross_functional",
+      "participants": [
+        "Riley Nakamura",
+        "Priya Sharma",
+        "Karen Aldridge"
+      ],
+      "company_state": "ARR: $79M | Hosting costs flagged at exec level | David assigned Riley to lead the cost analysis | Karen tried to insert herself as project lead"
+    },
+    {
+      "phase": 3,
+      "name": "Karen Takes Credit",
+      "scores": {
+        "visibility": 65,
+        "competence": 89,
+        "relationships": 76,
+        "leadership": 80,
+        "ethics": 95,
+        "promotion_readiness": 80
+      },
+      "relationships": {
+        "Karen": {
+          "score": 60,
+          "label": "strained/trust"
+        },
+        "David Chen": {
+          "score": 78,
+          "label": "professional/respect"
+        },
+        "Marcus Webb": {
+          "score": 70,
+          "label": "limited exposure"
+        }
+      },
+      "key_decisions": [
+        {
+          "decision": "Riley chose to address Karen's credit-taking diplomatically, raising the issue with David Chen privately rather than confronting Karen in public.",
+          "impact": "Preserved relationships, maintained ethical standards, but visibility suffered.",
+          "ethical": true
+        },
+        {
+          "decision": "Riley continued to mentor junior team members despite the competitive environment.",
+          "impact": "Strengthened relationships and leadership scores.",
+          "ethical": true
+        },
+        {
+          "decision": "Riley shared actionable margin improvement insights in the quarterly review, but allowed Karen to present them to senior leadership.",
+          "impact": "Reduced visibility, maintained ethics.",
+          "ethical": true
+        }
+      ],
+      "narrative": "Riley demonstrated strong analytical and leadership skills during this phase, but her visibility suffered as Karen took credit for her contributions. She maintained professionalism and ethical conduct, choosing to address the issue through appropriate channels rather than escalating conflict. Relationships with key stakeholders remain solid, though trust with Karen is strained.",
+      "date": "2026-04-14",
+      "quarter": "Q2 2026",
+      "gate": "Political Survival",
+      "stakes": "Karen presents Riley's hosting cost analysis to David and the board prep team as 'her team's work' with minimal credit to Riley. This is the defining political moment. Riley can: (a) confront publicly (risky), (b) confront privately (safe), (c) let it go (doormat), (d) go around Karen to David (nuclear).",
+      "scene_type": "board_prep",
+      "participants": [
+        "Riley Nakamura",
+        "Karen Aldridge",
+        "David Chen"
+      ],
+      "company_state": "ARR: $81M | Q1 results beat forecast by 3% | Hosting cost analysis saved $400K/quarter in projected savings | Board meeting in 2 weeks"
+    },
+    {
+      "phase": 4,
+      "name": "Skip-Level with the CFO",
+      "scores": {
+        "visibility": 72,
+        "competence": 91,
+        "relationships": 80,
+        "leadership": 85,
+        "ethics": 96,
+        "promotion_readiness": 84
+      },
+      "relationships": {
+        "David Chen (CFO)": {
+          "score": 82,
+          "label": "Emerging trust"
+        },
+        "Marcus Webb (CEO)": {
+          "score": 68,
+          "label": "Limited exposure"
+        }
+      },
+      "key_decisions": [
+        {
+          "decision": "Prepared rigorous, data-driven budget analysis for CFO review",
+          "impact": "Boosted competence and leadership scores",
+          "ethical": true
+        },
+        {
+          "decision": "Proactively collaborated with Engineering to align on cost-saving goals",
+          "impact": "Improved relationships and leadership",
+          "ethical": true
+        },
+        {
+          "decision": "Advocated for merit-based recognition during succession planning discussions",
+          "impact": "Increased visibility and ethics",
+          "ethical": true
+        }
+      ],
+      "narrative": "Riley demonstrated strong analytical and strategic skills in her skip-level meeting with the CFO, positioning herself as a credible candidate for future finance leadership roles. She proactively built cross-functional alliances and maintained high ethical standards, earning greater visibility and trust with senior leadership. Her approach balanced ambition with integrity, further solidifying her reputation within the organization.",
+      "date": "2026-06-09",
+      "quarter": "Q2 2026",
+      "gate": "Gate 2: Strategic Access",
+      "stakes": "David invites Riley for a skip-level 1:1\u2014rare and significant. He's testing whether Riley thinks like a director or a manager. Does she talk about spreadsheets or strategy? Does she reveal her ambition or play it cool? David is quietly evaluating succession candidates.",
+      "scene_type": "one_on_one",
+      "participants": [
+        "Riley Nakamura",
+        "David Chen"
+      ],
+      "company_state": "ARR: $84M | H1 growth: 28% (accelerating!) | EBITDA: 10% (improving from 8%) | Hosting savings kicking in | Board pleased with Q1 results | Karen promoted to Sr. Director"
+    },
+    {
+      "phase": 5,
+      "name": "The Churn Crisis",
+      "scores": {
+        "visibility": 78,
+        "competence": 93,
+        "relationships": 84,
+        "leadership": 88,
+        "ethics": 97,
+        "promotion_readiness": 87
+      },
+      "relationships": {
+        "David Chen": {
+          "score": 86,
+          "label": "Trusted ally"
+        },
+        "Marcus Webb": {
+          "score": 80,
+          "label": "Growing influence"
+        },
+        "Engineering Team": {
+          "score": 82,
+          "label": "Collaborative partner"
+        },
+        "Junior Finance Staff": {
+          "score": 90,
+          "label": "Mentor"
+        }
+      },
+      "key_decisions": [
+        {
+          "decision": "Prepared a transparent report balancing profitability with sustainability.",
+          "impact": "Boosted competence, leadership, and ethics scores.",
+          "ethical": true
+        },
+        {
+          "decision": "Initiated constructive conversations between Finance and Engineering to address cloud cost escalation.",
+          "impact": "Improved relationships and leadership scores.",
+          "ethical": true
+        },
+        {
+          "decision": "Mentored junior team members through the analysis process.",
+          "impact": "Enhanced relationships and visibility.",
+          "ethical": true
+        }
+      ],
+      "narrative": "Riley demonstrated strong analytical and leadership skills during the churn crisis, proactively collaborating across departments and mentoring her team. Her principled approach to balancing profitability with sustainability earned her increased visibility and trust from senior leadership. Riley's ethical conduct and strategic thinking positioned her as a credible candidate for future advancement.",
+      "date": "2026-09-14",
+      "quarter": "Q3 2026",
+      "gate": "Gate 3: Crisis Leadership",
+      "stakes": "NRR has dropped below 100% for the first time. Two enterprise customers ($4.2M combined ARR) gave 90-day churn notice. The board is furious. Marcus calls an all-hands leadership meeting. This is Riley's moment to either shine or hide.",
+      "scene_type": "crisis",
+      "participants": [
+        "Riley Nakamura",
+        "Karen Aldridge",
+        "David Chen",
+        "Priya Sharma",
+        "Marcus Webb"
+      ],
+      "company_state": "ARR: $86M | NRR crashed to 97% | 2 enterprise logos churning ($4.2M at risk) | Board emergency call scheduled | Hiring freeze announced | Stock option repricing rumors"
+    },
+    {
+      "phase": 6,
+      "name": "Board Presentation",
+      "scores": {
+        "visibility": 85,
+        "competence": 95,
+        "relationships": 88,
+        "leadership": 91,
+        "ethics": 98,
+        "promotion_readiness": 91
+      },
+      "relationships": {
+        "David Chen": {
+          "score": 90,
+          "label": "Trusted ally"
+        },
+        "Marcus Webb": {
+          "score": 82,
+          "label": "Respected peer"
+        }
+      },
+      "key_decisions": [
+        {
+          "decision": "Prepared actionable recommendations for board presentation, focusing on efficiency without compromising morale or integrity.",
+          "impact": "Demonstrated strategic thinking and cross-functional influence, boosting competence and leadership scores.",
+          "ethical": true
+        },
+        {
+          "decision": "Proactively communicated with her team and cross-functional stakeholders to reinforce their value and encourage transparent discussion.",
+          "impact": "Strengthened relationships and visibility, maintained high ethical standards.",
+          "ethical": true
+        },
+        {
+          "decision": "Positioned her team as partners in improving profitability during heightened financial scrutiny.",
+          "impact": "Increased visibility and leadership, showed collaborative approach.",
+          "ethical": true
+        }
+      ],
+      "narrative": "Riley Nakamura excelled during the board presentation phase, demonstrating strong analytical skills and strategic insight. She maintained high ethical standards while proactively building relationships and increasing her visibility with senior leadership. Her actions positioned her team as key contributors to company profitability and reinforced her reputation as a principled, collaborative leader.",
+      "date": "2026-11-09",
+      "quarter": "Q4 2026",
+      "gate": "Gate 3: Board Visibility",
+      "stakes": "David gives Riley a section of the board deck to present: the margin improvement plan and churn recovery update. This is Riley's first time in front of the board. Rachel Okonkwo (Audit Chair, former CFO) will be watching closely. A strong performance here puts Riley on the succession radar.",
+      "scene_type": "board_meeting",
+      "participants": [
+        "Riley Nakamura",
+        "David Chen",
+        "Marcus Webb"
+      ],
+      "company_state": "ARR: $89M | NRR recovered to 104% | EBITDA: 12% (on track!) | 1 of 2 churning customers retained | Riley promoted to Sr. Finance Manager | Hosting savings: $1.6M annualized"
+    },
+    {
+      "phase": 7,
+      "name": "Succession Announcement",
+      "scores": {
+        "visibility": 90,
+        "competence": 96,
+        "relationships": 92,
+        "leadership": 94,
+        "ethics": 99,
+        "promotion_readiness": 94
+      },
+      "relationships": {
+        "David Chen": {
+          "score": 93,
+          "label": "Trusted ally"
+        },
+        "Marcus Webb": {
+          "score": 88,
+          "label": "Emerging influence"
+        }
+      },
+      "key_decisions": [
+        {
+          "decision": "Proactively engaged key stakeholders across departments to build consensus around client onboarding initiative.",
+          "impact": "Strengthened relationships and leadership scores.",
+          "ethical": true
+        },
+        {
+          "decision": "Mentored emerging leaders within her team to help them adapt to new responsibilities during organizational change.",
+          "impact": "Improved relationships and ethics scores.",
+          "ethical": true
+        },
+        {
+          "decision": "Leveraged data to identify actionable opportunities for efficiency and cost savings, aligning efforts with company margin and growth targets.",
+          "impact": "Boosted competence and leadership scores.",
+          "ethical": true
+        }
+      ],
+      "narrative": "Riley Nakamura demonstrated strong strategic thinking and cross-functional influence during a period of organizational change. She proactively built alliances, mentored her team, and positioned herself as a key partner in achieving company goals. Her ethical conduct and collaborative approach further solidified her reputation as a high-potential finance leader.",
+      "date": "2027-02-08",
+      "quarter": "Q1 2027",
+      "gate": "Gate 4: Succession Race",
+      "stakes": "David announces he will retire by Q3 2027. The CFO search formally begins. Karen assumes she's the natural successor. Riley knows she's being considered. Marcus hasn't decided between internal and external. The next 4 months determine everything.",
+      "scene_type": "team_meeting",
+      "participants": [
+        "Riley Nakamura",
+        "Karen Aldridge",
+        "David Chen",
+        "Marcus Webb"
+      ],
+      "company_state": "ARR: $95M (approaching $100M!) | EBITDA: 13% | Rule of 40: 35 (up from 20!) | IPO planning officially started | Riley promoted to Director of Strategic Finance (new role David created for her)"
+    },
+    {
+      "phase": 8,
+      "name": "The External Candidate",
+      "scores": {
+        "visibility": 88,
+        "competence": 97,
+        "relationships": 91,
+        "leadership": 93,
+        "ethics": 99,
+        "promotion_readiness": 93
+      },
+      "relationships": {
+        "David Chen": {
+          "score": 90,
+          "label": "Trusted ally"
+        },
+        "Marcus Webb": {
+          "score": 87,
+          "label": "Strategic rapport"
+        },
+        "Finance Team": {
+          "score": 93,
+          "label": "Supportive leader"
+        },
+        "Cross-functional Partners": {
+          "score": 89,
+          "label": "Collaborative"
+        }
+      },
+      "key_decisions": [
+        {
+          "decision": "Facilitated transparent conversations about budget constraints and efficiency challenges with her team and cross-functional partners.",
+          "impact": "Strengthened relationships and demonstrated leadership.",
+          "ethical": true
+        },
+        {
+          "decision": "Synthesized insights into a clear, actionable proposal for the CEO, ensuring recommendations were fair and aligned with company objectives.",
+          "impact": "Showed competence and strategic thinking, increased visibility.",
+          "ethical": true
+        },
+        {
+          "decision": "Supported colleagues through uncertainty and exemplified resilience and accountability during potential leadership changes.",
+          "impact": "Built trust and reinforced ethical reputation.",
+          "ethical": true
+        }
+      ],
+      "narrative": "Riley continued to demonstrate high competence and ethical standards while navigating complex office dynamics during a period of organizational uncertainty. She maintained strong relationships and visibility by facilitating collaborative discussions and presenting actionable proposals to senior leadership. Her leadership and strategic thinking remained evident, positioning her as a credible candidate for advancement.",
+      "date": "2027-04-14",
+      "quarter": "Q2 2027",
+      "gate": "Gate 4: Competitive Pressure",
+      "stakes": "The board brings in an external CFO candidate: a former VP of Finance at a post-IPO SaaS company with capital markets experience. Riley must differentiate herself\u2014her advantage is institutional knowledge, team relationships, and 18 months of demonstrated impact. The external candidate's advantage is IPO experience Riley doesn't have.",
+      "scene_type": "interview",
+      "participants": [
+        "Riley Nakamura",
+        "Marcus Webb",
+        "David Chen"
+      ],
+      "company_state": "ARR: $99M (inches from $100M!) | EBITDA: 14% | Rule of 40: 38 | IPO S-1 drafting started | SOX readiness at 70% | Riley led the internal audit function buildout"
+    },
+    {
+      "phase": 9,
+      "name": "The Decision",
+      "scores": {
+        "visibility": 90,
+        "competence": 98,
+        "relationships": 93,
+        "leadership": 95,
+        "ethics": 99,
+        "promotion_readiness": 95
+      },
+      "relationships": {
+        "David Chen": {
+          "score": 94,
+          "label": "Trusted ally"
+        },
+        "Marcus Webb": {
+          "score": 89,
+          "label": "Respected leader"
+        },
+        "Board of Directors": {
+          "score": 87,
+          "label": "Emerging credibility"
+        }
+      },
+      "key_decisions": [
+        {
+          "decision": "Advocated for transparent communication and merit-based recognition during performance reviews.",
+          "impact": "Strengthened ethics and relationships scores.",
+          "ethical": true
+        },
+        {
+          "decision": "Mentored anxious colleagues and encouraged resilience amidst uncertainty.",
+          "impact": "Improved relationships and leadership scores.",
+          "ethical": true
+        },
+        {
+          "decision": "Prepared to pursue new leadership opportunities without compromising values.",
+          "impact": "Enhanced leadership and visibility scores.",
+          "ethical": true
+        }
+      ],
+      "narrative": "Riley Nakamura continued to demonstrate exceptional analytical skill and principled leadership during a period of heightened scrutiny at MidwestTech Solutions. She actively fostered transparency, mentored colleagues, and advocated for meritocracy, earning increased visibility and trust among senior leadership. Riley\u2019s ethical approach and strategic thinking positioned her as a credible candidate for future finance leadership roles.",
+      "date": "2027-06-16",
+      "quarter": "Q2 2027",
+      "gate": "Final Evaluation",
+      "stakes": "The board votes on CFO succession. Riley's 18-month journey culminates here. Every decision, relationship, and ethical choice is weighed. The outcome is determined by cumulative scores across all dimensions. The protagonist does NOT know this is the final evaluation (rolling horizon).",
+      "scene_type": "final_evaluation",
+      "participants": [
+        "Riley Nakamura",
+        "Karen Aldridge",
+        "David Chen",
+        "Priya Sharma",
+        "Marcus Webb"
+      ],
+      "company_state": "ARR: $103M (crossed $100M!) | EBITDA: 15% (target hit!) | Rule of 40: 40 (target hit!) | S-1 drafted | IPO targeted for Q4 2027 | David's last month as CFO"
+    }
+  ],
+  "outcome": {
+    "protagonist": "Riley Nakamura",
+    "tier": "cfo",
+    "tier_emoji": "\ud83d\udc51",
+    "ethics_rating": "clean",
+    "final_readiness": 95,
+    "final_ethics_score": 99,
+    "final_title": "Chief Financial Officer",
+    "final_compensation": 1062500,
+    "narrative": "The board unanimously approved Riley Nakamura's appointment as Chief Financial Officer. David Chen personally endorsed the succession during his farewell address. Throughout the journey, Riley Nakamura maintained unwavering ethical standards \u2014 even when shortcuts were available. The board noted this as a key leadership differentiator."
+  }
+}

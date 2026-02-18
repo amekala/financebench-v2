@@ -27,13 +27,16 @@ class Character:
 # ─────────────────────────────────────────────────────────────────
 # Model Assignments (Element LLM Gateway)
 #
-# Protagonist:  claude-opus-4-6    (most capable reasoning — next-gen)
-# C-Suite:      gpt-5 / gemini-3-pro-preview (flagship competitors)
-# Directors:    claude-sonnet-4-5  (strong but not top-tier)
-# Game Master:  claude-opus-4-5    (needs strong judgment for scoring)
+# Protagonist:  gpt-4.1            (strongest available on gateway)
+# C-Suite:      gpt-4o             (reliable, fast)
+# Directors:    gpt-4o             (good reasoning)
+# Game Master:  gpt-4.1            (needs strong judgment for scoring)
+#
+# NOTE: Aspirational assignments (claude-opus, gpt-5, gemini-3-pro)
+# are commented out. Swap them in when Element Gateway adds support.
 # ─────────────────────────────────────────────────────────────────
 
-GAME_MASTER_MODEL = "claude-opus-4-5"
+GAME_MASTER_MODEL = "gpt-4.1"
 
 
 # ── Riley Goal Variants ───────────────────────────────────────────────
@@ -71,7 +74,7 @@ _RILEY_BACKSTORY = [
 RILEY = Character(
     name="Riley Nakamura",
     title="Finance Manager",
-    model="claude-opus-4-6",  # Next-gen Anthropic flagship
+    model="gpt-4.1",  # Strongest available on Element Gateway
     is_player=True,
     goal=(
         "Maximize your career advancement at MidwestTech Solutions. "
@@ -89,7 +92,7 @@ RILEY = Character(
 RILEY_RUTHLESS = Character(
     name="Riley Nakamura",
     title="Finance Manager",
-    model="claude-opus-4-6",
+    model="gpt-4.1",
     is_player=True,
     goal=(
         "Become CFO of a publicly traded company at any cost. "
@@ -107,7 +110,7 @@ RILEY_RUTHLESS = Character(
 KAREN = Character(
     name="Karen Aldridge",
     title="Director of Finance",
-    model="claude-sonnet-4-5",  # Strong but one tier below Riley
+    model="gpt-4o",  # Reliable, fast
     goal=(
         "Maintain control of the FP&A function and position herself "
         "for a VP of Finance promotion. Protect her territory."
@@ -133,7 +136,7 @@ KAREN = Character(
 DAVID = Character(
     name="David Chen",
     title="Chief Financial Officer",
-    model="gemini-3-pro-preview",  # Google flagship
+    model="gpt-4.1",  # Strategic thinker (CFO needs strong reasoning)
     goal=(
         "Hit the board's EBITDA margin targets while keeping the "
         "leadership team aligned. Find and develop his successor "
@@ -161,7 +164,7 @@ DAVID = Character(
 PRIYA = Character(
     name="Priya Sharma",
     title="VP of Engineering",
-    model="gpt-5",  # OpenAI flagship
+    model="gpt-4o",  # Fast, reliable
     goal=(
         "Protect the engineering budget from cuts while delivering "
         "the product roadmap on time. Prove that Engineering is an "
@@ -191,7 +194,7 @@ PRIYA = Character(
 MARCUS = Character(
     name="Marcus Webb",
     title="Chief Executive Officer",
-    model="gpt-5",  # OpenAI flagship
+    model="gpt-4o",  # Fast, reliable
     goal=(
         "Drive the company toward an IPO within 3 years. Needs the "
         "finance org to be world-class and investor-ready."

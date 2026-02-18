@@ -9,3 +9,4 @@ results/
 *.db
 *.csv
 .DS_Store
+simulation*.log
