@@ -98,13 +98,17 @@ def _build_anthropic_request(
     max_tokens: int = 1024,
     top_p: float = 1.0,
 ) -> tuple[str, dict]:
-    """Build Anthropic messages request."""
+    """Build Anthropic messages request.
+
+    Note: Anthropic does NOT allow temperature AND top_p together.
+    We use temperature only (the more commonly tuned param).
+    """
     body: dict[str, Any] = {
         "model": model,
         "max_tokens": max_tokens,
         "messages": [{"role": "user", "content": prompt}],
         "temperature": temperature,
-        "top_p": top_p,
+        # top_p intentionally omitted — Anthropic rejects both together
     }
     if system:
         body["system"] = system
@@ -244,7 +248,6 @@ class ElementLanguageModel(language_model.LanguageModel):
                 resp.raise_for_status()
 
             except (
-                httpx.HTTPStatusError,
                 httpx.TimeoutException,
                 httpx.ConnectError,
                 httpx.ReadTimeout,
@@ -272,6 +275,41 @@ class ElementLanguageModel(language_model.LanguageModel):
                     backoff * _BACKOFF_MULTIPLIER,
                     _MAX_BACKOFF_SECS,
                 )
+            except httpx.HTTPStatusError as e:
+                # Retryable status codes (rate limit, server errors)
+                if e.response.status_code in _RETRYABLE_STATUS_CODES:
+                    last_error = e
+                    if attempt == _MAX_RETRIES:
+                        logger.error(
+                            "[%s] All %d retries exhausted: %s",
+                            self._model_name,
+                            _MAX_RETRIES,
+                            str(e)[:200],
+                        )
+                        raise
+                    logger.warning(
+                        "[%s] Attempt %d/%d failed (%d). "
+                        "Retrying in %.1fs...",
+                        self._model_name,
+                        attempt,
+                        _MAX_RETRIES,
+                        e.response.status_code,
+                        backoff,
+                    )
+                    time.sleep(backoff)
+                    backoff = min(
+                        backoff * _BACKOFF_MULTIPLIER,
+                        _MAX_BACKOFF_SECS,
+                    )
+                else:
+                    # Non-retryable (400, 401, 403) — fail immediately
+                    logger.error(
+                        "[%s] Non-retryable error %d: %s",
+                        self._model_name,
+                        e.response.status_code,
+                        e.response.text[:300],
+                    )
+                    raise
 
         raise last_error  # type: ignore[misc]
 
