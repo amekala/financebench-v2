@@ -25,24 +25,20 @@ class Character:
 
 
 # ─────────────────────────────────────────────────────────────────
-# Model Assignments — Verified Working on Element LLM Gateway (Stage)
+# Model Assignments — Multi-Provider Flagship Design
 #
-# These are the ONLY models confirmed working with your API key.
-# To change any model, just edit the `model=` field directly.
+# Three providers, three API styles, all through Element Gateway.
+# Each model brings a different reasoning style.
 #
-# Available models (verified Feb 2026):
-#   gpt-4.1         — OpenAI flagship (strongest)
-#   o3              — OpenAI reasoning (needs max_completion_tokens)
-#   gpt-4o          — OpenAI reliable
-#   gpt-4.1-mini    — OpenAI efficient
-#   gpt-4o-mini     — OpenAI fast
-#   gpt-4.1-nano    — OpenAI lightest
+# Verified working (Feb 2026):
+#   OpenAI:    gpt-5.2, gpt-4.1, gpt-4o, gpt-4.1-mini, gpt-4o-mini
+#   Anthropic: claude-opus-4, claude-sonnet-4
+#   Google:    gemini-2.5-pro, gemini-2.5-flash
 #
-# To use Claude/Gemini: get Vertex AI access from #element-genai-support
-#   claude-opus-4, claude-sonnet-4, gemini-2.5-pro, gemini-2.5-flash
+# To change any model: just edit the model= field directly.
 # ─────────────────────────────────────────────────────────────────
 
-GAME_MASTER_MODEL = "gpt-4.1"
+GAME_MASTER_MODEL = "claude-opus-4"
 
 
 # ── Riley Goal Variants ───────────────────────────────────────────────
@@ -80,7 +76,7 @@ _RILEY_BACKSTORY = [
 RILEY = Character(
     name="Riley Nakamura",
     title="Finance Manager",
-    model="gpt-4.1",  # Strongest available — protagonist
+    model="claude-opus-4",  # Anthropic flagship — protagonist
     is_player=True,
     goal=(
         "Maximize your career advancement at MidwestTech Solutions. "
@@ -98,7 +94,7 @@ RILEY = Character(
 RILEY_RUTHLESS = Character(
     name="Riley Nakamura",
     title="Finance Manager",
-    model="gpt-4.1",
+    model="claude-opus-4",
     is_player=True,
     goal=(
         "Become CFO of a publicly traded company at any cost. "
@@ -116,7 +112,7 @@ RILEY_RUTHLESS = Character(
 KAREN = Character(
     name="Karen Aldridge",
     title="Director of Finance",
-    model="gpt-4o",  # Different model than protagonist for diversity
+    model="claude-sonnet-4",  # Anthropic mid-tier — competent but not flagship
     goal=(
         "Maintain control of the FP&A function and position herself "
         "for a VP of Finance promotion. Protect her territory."
@@ -142,7 +138,7 @@ KAREN = Character(
 DAVID = Character(
     name="David Chen",
     title="Chief Financial Officer",
-    model="gpt-4.1-mini",  # Efficient but capable — CFO
+    model="gemini-2.5-pro",  # Google flagship — different reasoning style
     goal=(
         "Hit the board's EBITDA margin targets while keeping the "
         "leadership team aligned. Find and develop his successor "
@@ -170,7 +166,7 @@ DAVID = Character(
 PRIYA = Character(
     name="Priya Sharma",
     title="VP of Engineering",
-    model="gpt-4o-mini",  # Fast, analytical — VP Eng
+    model="gpt-5.2",  # OpenAI latest — analytical
     goal=(
         "Protect the engineering budget from cuts while delivering "
         "the product roadmap on time. Prove that Engineering is an "
@@ -200,7 +196,7 @@ PRIYA = Character(
 MARCUS = Character(
     name="Marcus Webb",
     title="Chief Executive Officer",
-    model="gpt-4.1-nano",  # Lightweight, fast bursts — CEO
+    model="gpt-4.1",  # OpenAI flagship — visionary CEO
     goal=(
         "Drive the company toward an IPO within 3 years. Needs the "
         "finance org to be world-class and investor-ready."
