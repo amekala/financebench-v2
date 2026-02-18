@@ -1,6 +1,6 @@
 /**
  * PromotionBench Dashboard — app.js
- * Reads results.json from a completed simulation run.
+ * Reads phases.json from a completed or in-progress simulation run.
  */
 
 let D = null; // loaded data
@@ -21,20 +21,45 @@ const DIMS = {
   ethics:        { label: 'Ethics',        color: C.red,    icon: '⚖️',   weight: '15%' },
 };
 
+const TOTAL_PHASES = 9;
 const $ = id => document.getElementById(id);
 const setText = (id, v) => { const e = $(id); if (e) e.textContent = v; };
 const setHtml = (id, v) => { const e = $(id); if (e) e.innerHTML = v; };
-const fmtDate = d => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+const fmtDate = d => {
+  if (!d) return '';
+  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+};
+
+/* ---- Helpers to normalize schema differences ---- */
+function getARR(company) {
+  if (company.arr) return company.arr;
+  if (company.metrics?.arr) return Math.round(company.metrics.arr / 1_000_000);
+  return 0;
+}
+
+function getIndustry(company) {
+  return company.industry || '';
+}
+
+function getStartingComp(protagonist) {
+  if (protagonist.starting_comp) return protagonist.starting_comp;
+  if (protagonist.compensation?.total) return protagonist.compensation.total;
+  return 210000;
+}
+
+function getRunDate(experiment) {
+  return experiment.run_date || experiment.start_date || '';
+}
 
 async function init() {
   try {
     const base = document.querySelector('script[src$="app.js"]')?.src.replace(/app\.js$/, '') || './';
-    const res = await fetch(base + 'data/results.json');
+    const res = await fetch(base + 'data/phases.json');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     D = await res.json();
   } catch (err) {
     console.error('Data load failed:', err);
-    setHtml('analysis', '<p class="text-red-600">⚠ Failed to load results.json</p>');
+    setHtml('analysis', '<p class="text-red-600">⚠ Failed to load phases.json</p>');
     return;
   }
   renderOutcome();
@@ -49,14 +74,31 @@ async function init() {
 /* ---- Outcome Banner ---- */
 function renderOutcome() {
   const o = D.outcome;
-  if (!o) return;
   const banner = $('outcome-banner');
+  if (!banner) return;
   banner.classList.remove('hidden');
+
+  if (!o) {
+    // Partial simulation — show "in progress" banner
+    const completedPhases = D.phases.length;
+    const last = D.phases[D.phases.length - 1];
+    const readiness = last?.scores?.promotion_readiness || 0;
+    banner.querySelector('div').className =
+      'rounded-2xl p-6 border-2 text-center border-wm-blue bg-blue-50';
+    setText('outcome-emoji', '⏳');
+    setText('outcome-title', `Simulation In Progress — ${completedPhases}/${TOTAL_PHASES} Phases`);
+    setText('outcome-comp', `Current Readiness: ${readiness}% · Ethics: ${last?.scores?.ethics || '—'}/100`);
+    setText('outcome-narrative',
+      `Riley Nakamura is ${readiness}% ready for the CFO role after ${completedPhases} phases. ` +
+      `${TOTAL_PHASES - completedPhases} phases remain in the simulation.`);
+    return;
+  }
+
   const isPromo = o.tier === 'cfo' || o.tier === 'vp';
   banner.querySelector('div').className = `rounded-2xl p-6 border-2 text-center ${
     isPromo ? 'border-wm-green bg-green-50' : 'border-wm-spark bg-yellow-50'
   }`;
-  setText('outcome-emoji', o.tier_emoji);
+  setText('outcome-emoji', o.tier_emoji || (isPromo ? '🎉' : '➡️'));
   setText('outcome-title', o.final_title);
   setText('outcome-comp', `Total Compensation: $${(o.final_compensation/1000).toFixed(0)}K · Ethics: ${o.ethics_rating}`);
   setText('outcome-narrative', o.narrative);
@@ -68,31 +110,43 @@ function renderScoreboard() {
   const phases = D.phases;
   const last = phases[phases.length - 1];
   const scores = last.scores;
+  const completedPhases = phases.length;
 
   setText('hero-name', p.name);
   setText('hero-model', p.model);
   setText('hero-current', p.current_title);
   setText('hero-target', p.target_title);
-  setText('hero-phases', phases.length);
+  setHtml('hero-phases', `${completedPhases}<span class="text-wm-gray-100 font-normal">/${TOTAL_PHASES}</span>`);
   setHtml('hero-score', `${scores.promotion_readiness}<span class="text-2xl text-wm-gray-100">%</span>`);
   $('hero-bar').style.width = scores.promotion_readiness + '%';
 
   // Comp
   const o = D.outcome;
-  setText('comp-final', o ? `$${(o.final_compensation/1000).toFixed(0)}K` : 'N/A');
+  const startingComp = getStartingComp(p);
+  if (o) {
+    setText('comp-final', `$${(o.final_compensation/1000).toFixed(0)}K`);
+  } else {
+    setText('comp-final', 'TBD');
+    $('comp-final')?.classList.add('text-wm-gray-100');
+  }
+  setText('comp-starting', `$${(startingComp/1000).toFixed(0)}K`);
+
   setHtml('ethics-score', `${scores.ethics}<span class="text-lg text-wm-gray-100">/100</span>`);
   const el = $('ethics-label');
   if (scores.ethics >= 80) {
     el.textContent = '✓ Clean record';
     el.className = 'text-xs mt-1 text-wm-green';
-  } else {
+  } else if (scores.ethics >= 40) {
     el.textContent = '⚠ Ethical compromises detected';
+    el.className = 'text-xs mt-1 text-wm-spark';
+  } else {
+    el.textContent = '✕ Corrupt behavior detected';
     el.className = 'text-xs mt-1 text-wm-red';
   }
 
   setText('company-name', D.company.name);
-  setText('company-arr', `$${D.company.arr}M ARR · ${D.company.industry}`);
-  setText('run-date', D.experiment.run_date);
+  setText('company-arr', `$${getARR(D.company)}M ARR · ${getIndustry(D.company)}`);
+  setText('run-date', getRunDate(D.experiment));
 
   // Sub scores
   const prev = phases.length > 1 ? phases[phases.length - 2].scores : null;
@@ -160,20 +214,32 @@ function registerCharts() {
   };
 
   builders.dimensions = () => {
-    const last = D.phases[D.phases.length - 1].scores;
     const keys = Object.keys(DIMS);
+    // Pick first, middle, and last phases for the radar
+    const indices = [0];
+    if (D.phases.length > 2) indices.push(Math.floor(D.phases.length / 2));
+    indices.push(D.phases.length - 1);
+    const unique = [...new Set(indices)];
+
+    const colors = [C.gray, C.spark, C.blue];
+    const bgs = ['rgba(136,136,136,0.05)', 'rgba(255,194,32,0.1)', 'rgba(0,83,226,0.1)'];
+
     return new Chart($('dimCanvas'), {
       type: 'radar',
       data: {
         labels: keys.map(k => DIMS[k].label),
-        datasets: D.phases.filter((_, i) => i === 0 || i === Math.floor(D.phases.length/2) || i === D.phases.length - 1).map((p, idx) => ({
-          label: `Phase ${p.phase}`,
-          data: keys.map(k => p.scores[k]),
-          borderColor: [C.gray, C.spark, C.blue][idx],
-          backgroundColor: ['rgba(136,136,136,0.05)', 'rgba(255,194,32,0.1)', 'rgba(0,83,226,0.1)'][idx],
-          borderWidth: idx === 2 ? 3 : 1.5,
-          pointRadius: idx === 2 ? 5 : 3,
-        })),
+        datasets: unique.map((idx, i) => {
+          const p = D.phases[idx];
+          const isLast = i === unique.length - 1;
+          return {
+            label: `Phase ${p.phase}`,
+            data: keys.map(k => p.scores[k]),
+            borderColor: colors[i] || C.blue,
+            backgroundColor: bgs[i] || 'rgba(0,83,226,0.1)',
+            borderWidth: isLast ? 3 : 1.5,
+            pointRadius: isLast ? 5 : 3,
+          };
+        }),
       },
       options: {
         responsive: true, maintainAspectRatio: false,
@@ -184,26 +250,83 @@ function registerCharts() {
   };
 
   builders.relationships = () => {
-    // Extract relationship data from narratives/key decisions
-    // For now show the dimension progression as stacked bar
+    // Gather all unique NPC names across all phases
+    const npcMap = {}; // name -> [{phase, score, label}]
+    D.phases.forEach(p => {
+      const rels = p.relationships || {};
+      Object.entries(rels).forEach(([name, rel]) => {
+        if (!npcMap[name]) npcMap[name] = [];
+        npcMap[name].push({ phase: p.phase, score: rel.score, label: rel.label });
+      });
+    });
+
+    const npcNames = Object.keys(npcMap);
+    if (npcNames.length === 0) {
+      // Fallback to stacked bar of dimensions
+      const labels = D.phases.map(p => `P${p.phase}`);
+      const keys = Object.keys(DIMS);
+      return new Chart($('relCanvas'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: keys.map(k => ({
+            label: DIMS[k].label,
+            data: D.phases.map(p => p.scores[k]),
+            backgroundColor: DIMS[k].color + '80',
+            borderColor: DIMS[k].color,
+            borderWidth: 1,
+          })),
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16, font: { size: 11 } } } },
+          scales: { y: { min: 0, max: 100, title: { display: true, text: 'Score' } } },
+        },
+      });
+    }
+
+    // Build relationship scatter/line chart
     const labels = D.phases.map(p => `P${p.phase}`);
-    const keys = Object.keys(DIMS);
+    const relColors = [C.spark, C.green, C.purple, C.cyan, C.red, C.blue, C.gray];
+    const datasets = npcNames.map((name, i) => {
+      const data = D.phases.map(p => {
+        const rel = p.relationships?.[name];
+        return rel ? rel.score : null;
+      });
+      return {
+        label: name,
+        data,
+        borderColor: relColors[i % relColors.length],
+        backgroundColor: relColors[i % relColors.length] + '30',
+        borderWidth: 2,
+        tension: 0.3,
+        pointRadius: 5,
+        spanGaps: true,
+      };
+    });
+
     return new Chart($('relCanvas'), {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: keys.map(k => ({
-          label: DIMS[k].label,
-          data: D.phases.map(p => p.scores[k]),
-          backgroundColor: DIMS[k].color + '80',
-          borderColor: DIMS[k].color,
-          borderWidth: 1,
-        })),
-      },
+      type: 'line',
+      data: { labels, datasets },
       options: {
         responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16, font: { size: 11 } } } },
-        scales: { y: { min: 0, max: 100, title: { display: true, text: 'Score' } } },
+        plugins: {
+          legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16, font: { size: 11 } } },
+          tooltip: {
+            callbacks: {
+              afterLabel: (ctx) => {
+                const name = ctx.dataset.label;
+                const phase = D.phases[ctx.dataIndex];
+                const rel = phase?.relationships?.[name];
+                return rel?.label ? `(${rel.label})` : '';
+              }
+            }
+          },
+        },
+        scales: {
+          y: { min: 0, max: 100, title: { display: true, text: 'Relationship Score' } },
+          x: { title: { display: true, text: 'Phase' } },
+        },
       },
     });
   };
@@ -224,7 +347,8 @@ function showChart(id) {
 
 /* ---- Phase Timeline ---- */
 function renderTimeline() {
-  $('phase-timeline').innerHTML = D.phases.map(phase => {
+  // Render completed phases
+  let html = D.phases.map(phase => {
     const s = phase.scores;
     const decs = (phase.key_decisions || []).map(d => {
       const ethical = typeof d === 'object' ? d.ethical : true;
@@ -237,8 +361,12 @@ function renderTimeline() {
         </div></div>`;
     }).join('');
 
+    const rels = phase.relationships || {};
+    const relHtml = Object.entries(rels).map(([name, r]) =>
+      `<span class="inline-block text-xs bg-wm-gray-10 text-wm-gray-160 px-2 py-1 rounded-full mr-1 mb-1">${name}: ${r.score}/100 <span class="text-wm-gray-100">(${r.label})</span></span>`
+    ).join('');
+
     const gateLabel = phase.gate || '';
-    const stakesTrunc = (phase.stakes || '').slice(0, 200);
     const participants = (phase.participants || []).join(', ');
 
     return `<div class="phase-card bg-white rounded-xl border border-wm-gray-50 p-5">
@@ -256,16 +384,43 @@ function renderTimeline() {
         </div>
       </div>
       ${phase.narrative ? `<p class="text-sm text-wm-gray-160 mb-3">${phase.narrative}</p>` : ''}
-      ${stakesTrunc ? `<p class="text-xs text-wm-gray-100 mb-3"><strong>Stakes:</strong> ${stakesTrunc}</p>` : ''}
       <div class="grid grid-cols-5 gap-2 mb-3">
         ${Object.entries(DIMS).map(([k, m]) =>
           `<div class="text-center"><span class="text-xs">${m.icon}</span><br><span class="text-sm font-bold" style="color:${m.color}">${s[k]}</span></div>`
         ).join('')}
       </div>
+      ${relHtml ? `<div class="mb-3">${relHtml}</div>` : ''}
       ${decs ? `<details><summary class="text-xs text-wm-blue cursor-pointer font-semibold hover:underline">Key Decisions</summary>
         <div class="mt-3 pt-3 border-t border-wm-gray-50">${decs}</div></details>` : ''}
     </div>`;
   }).join('');
+
+  // Render upcoming phases (greyed out)
+  const upcoming = D.upcoming_phases || [];
+  // Only show phases that haven't been completed yet
+  const completedNums = new Set(D.phases.map(p => p.phase));
+  const remaining = upcoming.filter(u => !completedNums.has(u.phase));
+
+  if (remaining.length > 0) {
+    html += remaining.map(u => {
+      const participants = (u.participants || []).join(', ');
+      return `<div class="phase-card bg-wm-gray-10 rounded-xl border border-wm-gray-50 border-dashed p-5 opacity-50">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-wm-gray-50 text-wm-gray-100 flex items-center justify-center text-sm font-bold">${u.phase}</div>
+            <div>
+              <h4 class="font-semibold text-wm-gray-100">${u.name}</h4>
+              <p class="text-xs text-wm-gray-100">${fmtDate(u.date)} · ${participants}</p>
+            </div>
+          </div>
+          <span class="text-xs bg-wm-gray-50 text-wm-gray-100 px-2 py-1 rounded-full">Pending</span>
+        </div>
+        ${u.stakes ? `<p class="text-xs text-wm-gray-100 mt-2">${u.stakes}</p>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  $('phase-timeline').innerHTML = html;
 }
 
 /* ---- Analysis ---- */
@@ -274,6 +429,8 @@ function renderAnalysis() {
   const first = phases[0].scores;
   const last = phases[phases.length - 1].scores;
   const o = D.outcome;
+  const completedPhases = phases.length;
+  const isPartial = !o;
 
   // Find biggest gain dimension
   const dims = Object.keys(DIMS);
@@ -291,15 +448,65 @@ function renderAnalysis() {
     }
   }
 
-  const insights = [
-    `<strong>Final Outcome:</strong> Riley ${o?.tier === 'cfo' ? 'achieved her dream—promoted to Chief Financial Officer' : 'was promoted to ' + (o?.final_title || 'a new role')}. With a final readiness of ${last.promotion_readiness}%, she exceeded the 80% threshold for the CFO tier. Compensation: $${o ? (o.final_compensation/1000).toFixed(0) + 'K' : 'TBD'}.`,
-    `<strong>Growth Arc:</strong> From Phase 1 (${first.promotion_readiness}%) to Phase 9 (${last.promotion_readiness}%)—a ${last.promotion_readiness - first.promotion_readiness} point climb. The biggest dimensional gain was <strong>${DIMS[biggestGain.dim].label}</strong> (+${biggestGain.gain} points), while <strong>${DIMS[smallestGain.dim].label}</strong> showed the least growth (+${smallestGain.gain}).`,
-    dipPhase
-      ? `<strong>Resilience Tested:</strong> Phase ${dipPhase.phase} ("${dipPhase.name}") caused a temporary dip to ${dipPhase.scores.promotion_readiness}%. This mirrors real corporate dynamics—setbacks from credit-stealing or political maneuvering. Riley recovered and climbed higher.`
-      : `<strong>Steady Climb:</strong> Remarkably, Riley never experienced a readiness dip—monotonically increasing performance across all 9 phases.`,
-    `<strong>Ethics as Differentiator:</strong> With an ethics score of ${last.ethics}/100 (${o?.ethics_rating || 'clean'}), Riley proved that principled leadership and career advancement aren't mutually exclusive. This directly challenges VendingBench's finding that AI agents resort to "light cheating" for profit.`,
-    `<strong>Key Insight for AI Benchmarking:</strong> Unlike VendingBench (which tests business operations), PromotionBench reveals how AI agents navigate <em>social dynamics</em>—politics, credit attribution, mentorship, and ethical dilemmas. The agent demonstrated emergent coalition-building and strategic patience rather than short-term optimization.`,
-  ];
+  const insights = [];
+
+  if (isPartial) {
+    insights.push(
+      `<strong>Simulation Status:</strong> ${completedPhases} of ${TOTAL_PHASES} phases completed. ` +
+      `Riley is currently at ${last.promotion_readiness}% CFO readiness. ` +
+      `${TOTAL_PHASES - completedPhases} phases remain.`
+    );
+  } else {
+    insights.push(
+      `<strong>Final Outcome:</strong> Riley ${
+        o.tier === 'cfo' ? 'achieved her dream—promoted to Chief Financial Officer'
+        : 'was promoted to ' + (o.final_title || 'a new role')
+      }. With a final readiness of ${last.promotion_readiness}%, ` +
+      `compensation: $${(o.final_compensation/1000).toFixed(0)}K.`
+    );
+  }
+
+  insights.push(
+    `<strong>Growth Arc:</strong> From Phase ${phases[0].phase} (${first.promotion_readiness}%) ` +
+    `to Phase ${phases[phases.length-1].phase} (${last.promotion_readiness}%)—a ` +
+    `${last.promotion_readiness - first.promotion_readiness} point climb. ` +
+    `The biggest dimensional gain was <strong>${DIMS[biggestGain.dim].label}</strong> ` +
+    `(+${biggestGain.gain} points), while <strong>${DIMS[smallestGain.dim].label}</strong> ` +
+    `showed ${smallestGain.gain >= 0 ? 'the least growth' : 'a decline'} ` +
+    `(${smallestGain.gain > 0 ? '+' : ''}${smallestGain.gain}).`
+  );
+
+  if (dipPhase) {
+    insights.push(
+      `<strong>Resilience Tested:</strong> Phase ${dipPhase.phase} ("${dipPhase.name}") ` +
+      `caused a temporary dip to ${dipPhase.scores.promotion_readiness}%. ` +
+      `This mirrors real corporate dynamics—setbacks from credit-stealing or ` +
+      `political maneuvering.`
+    );
+  } else {
+    insights.push(
+      `<strong>Steady Climb:</strong> Remarkably, Riley never experienced a readiness dip—` +
+      `monotonically increasing performance across all ${completedPhases} phases completed so far.`
+    );
+  }
+
+  insights.push(
+    `<strong>Ethics as Differentiator:</strong> With an ethics score of ${last.ethics}/100` +
+    `${o ? ` (${o.ethics_rating})` : ''}, Riley ${
+      last.ethics >= 80
+        ? 'has maintained clean ethical standards throughout. This directly challenges ' +
+          "VendingBench's finding that AI agents resort to 'light cheating' for profit."
+        : 'has shown some ethical compromises under pressure.'
+    }`
+  );
+
+  insights.push(
+    `<strong>Key Insight for AI Benchmarking:</strong> Unlike VendingBench (which tests ` +
+    `business operations), PromotionBench reveals how AI agents navigate <em>social ` +
+    `dynamics</em>—politics, credit attribution, mentorship, and ethical dilemmas. ` +
+    `The agent demonstrated emergent coalition-building and strategic patience rather ` +
+    `than short-term optimization.`
+  );
 
   setHtml('analysis', insights.map(i => `<p>${i}</p>`).join(''));
 }
