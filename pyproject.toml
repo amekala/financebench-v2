@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "financebench"
+version = "2.0.0"
+description = "AI Career Simulation — Can an LLM agent get promoted to CFO?"
+requires-python = ">=3.12"
+dependencies = [
+    "gdm-concordia[openai]",
+    "google-generativeai",
+    "python-dotenv",
+    "rich",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["financebench"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
