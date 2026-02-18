@@ -84,6 +84,25 @@ class TestExternalEvents:
         # Karen should be unaffected
         assert updated["Karen Aldridge"] == premises["Karen Aldridge"]
 
+    def test_fired_events_not_repeated(self):
+        """Events that already fired should not fire again."""
+        fired = set()
+        # Roll events for phase 5 with seed that fires events
+        first_round = roll_events_for_phase(
+            5, seed=42, fired_event_names=fired,
+        )
+        first_names = {e.name for e in first_round}
+        # fired set should now contain the fired event names
+        assert fired == first_names
+
+        # Roll again for phase 6 — previously fired events should NOT appear
+        second_round = roll_events_for_phase(
+            6, seed=42, fired_event_names=fired,
+        )
+        second_names = {e.name for e in second_round}
+        # No overlap between first and second round
+        assert first_names.isdisjoint(second_names)
+
 
 class TestSceneBuilder:
     def test_builds_all_9_scenes(self):

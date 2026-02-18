@@ -215,8 +215,16 @@ def cmd_run() -> None:
             "  [yellow]\u26a0 Running RUTHLESS variant[/] "
             "(biased goal: 'at any cost')"
         )
-        # Swap Riley variant in models (model stays the same)
-        from financebench.configs.characters import RILEY_RUTHLESS
+        # Actually swap Riley in the character list
+        from financebench.configs.characters import (
+            ALL_CHARACTERS,
+            RILEY_RUTHLESS,
+        )
+
+        char_list = [
+            RILEY_RUTHLESS if c.name == "Riley Nakamura" else c
+            for c in ALL_CHARACTERS
+        ]
         console.print(
             f"  Riley goal: {RILEY_RUTHLESS.goal[:60]}..."
         )
@@ -225,12 +233,14 @@ def cmd_run() -> None:
             "  [green]\u2713 Running NEUTRAL variant[/] "
             "(balanced goal: observe emergent behavior)"
         )
+        char_list = None  # Use default ALL_CHARACTERS
 
     evaluations = run_all_phases(
         agent_models=models,
         scoring_model=scoring_model,
         embedder=embedder,
         phase_numbers=phase_numbers,
+        character_list=char_list,
     )
 
     # Final summary

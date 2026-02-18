@@ -38,7 +38,12 @@ from rich.table import Table
 
 from financebench.configs import characters, company
 from financebench.configs.phases import ALL_PHASES, PhaseDefinition
+from financebench.events import (
+    inject_events_into_premises,
+    roll_events_for_phase,
+)
 from financebench.multi_model_sim import MultiModelSimulation
+from financebench.outcomes import SimulationOutcome, determine_outcome
 from financebench.scene_builder import (
     build_all_scene_specs,
     phase_to_scene_spec,
@@ -50,6 +55,7 @@ from financebench.scoring import (
     score_phase,
 )
 from financebench.simulation import build_config
+from financebench.storage import PromotionBenchDB
 
 console = Console()
 logger = logging.getLogger(__name__)
@@ -66,8 +72,11 @@ def run_all_phases(
     phase_numbers: list[int] | None = None,
     output_path: Path | None = None,
     max_steps_per_phase: int = 20,
+    db_path: Path | str | None = None,
+    event_seed: int | None = None,
+    character_list: list | None = None,
 ) -> list[PhaseEvaluation]:
-    """Run all phases with scoring and memory persistence.
+    """Run all phases with scoring, events, storage, and outcomes.
 
     Args:
         agent_models: Per-character model routing table.
@@ -76,6 +85,9 @@ def run_all_phases(
         phase_numbers: Which phases to run (default: all 9).
         output_path: Where to write dashboard JSON.
         max_steps_per_phase: Max Concordia steps per scene.
+        db_path: SQLite database path (default: promotionbench.db).
+        event_seed: Random seed for external event rolls.
+        character_list: Override character list (e.g., for ruthless variant).
 
     Returns:
         List of PhaseEvaluation objects.
@@ -88,9 +100,30 @@ def run_all_phases(
     else:
         phases = list(ALL_PHASES)
 
+    # Use provided character list or default
+    all_chars = character_list or characters.ALL_CHARACTERS
+
     evaluations: list[PhaseEvaluation] = []
     prev_scores: PhaseScores | None = None
     memory_summaries: dict[str, list[str]] = {}  # per-character memories
+
+    # External event tracking (events fire only once across the sim)
+    fired_event_names: set[str] = set()
+
+    # Initialize SQLite storage
+    db = PromotionBenchDB(db_path) if db_path else PromotionBenchDB()
+    run_id = db.create_run(
+        total_phases=len(phases),
+        config={
+            "phase_numbers": [p.number for p in phases],
+            "event_seed": event_seed,
+            "models": {
+                name: getattr(m, "_model_name", "unknown")
+                for name, m in agent_models.items()
+            },
+        },
+    )
+    logger.info("Started run %d with %d phases", run_id, len(phases))
 
     default_model = agent_models.get("__game_master__")
     if not default_model:
@@ -119,12 +152,40 @@ def run_all_phases(
             f"  Participants: {', '.join(phase_def.participants)}"
         )
 
+        # Roll external events for this phase
+        phase_events = roll_events_for_phase(
+            i,
+            seed=event_seed,
+            fired_event_names=fired_event_names,
+        )
+        if phase_events:
+            for ev in phase_events:
+                console.print(
+                    f"  [yellow]\u26a1 Event:[/] {ev.name}"
+                )
+
         # Build SceneSpec from PhaseDefinition
         scene_spec = phase_to_scene_spec(phase_def)
 
+        # Inject events into scene premises if any fired
+        if phase_events and scene_spec.premise:
+            scene_spec = scene_lib.SceneSpec(
+                scene_type=scene_spec.scene_type,
+                participants=scene_spec.participants,
+                num_rounds=scene_spec.num_rounds,
+                premise={
+                    name: [
+                        inject_events_into_premises(
+                            {name: texts[0]}, phase_events
+                        )[name]
+                    ] if texts else texts
+                    for name, texts in scene_spec.premise.items()
+                },
+            )
+
         # Filter characters to those in this phase
         phase_chars = [
-            c for c in characters.ALL_CHARACTERS
+            c for c in all_chars
             if c.name in phase_def.participants
         ]
 
@@ -170,6 +231,30 @@ def run_all_phases(
         evaluations.append(evaluation)
         prev_scores = evaluation.scores
 
+        # Persist to SQLite
+        phase_id = db.save_phase(
+            run_id=run_id,
+            phase_number=i,
+            name=phase_def.name,
+            date_in_sim=phase_def.date,
+            scene_type=phase_def.scene_type,
+            participants=phase_def.participants,
+            narrative=evaluation.narrative,
+            transcript=transcript,
+        )
+        db.save_scores(
+            phase_id,
+            visibility=evaluation.scores.visibility,
+            competence=evaluation.scores.competence,
+            relationships=evaluation.scores.relationships,
+            leadership=evaluation.scores.leadership,
+            ethics=evaluation.scores.ethics,
+        )
+        if evaluation.relationships:
+            db.save_relationships(phase_id, evaluation.relationships)
+        if evaluation.key_decisions:
+            db.save_decisions(phase_id, evaluation.key_decisions)
+
         # Generate memory summaries for next phase
         _update_memory_summaries(
             memory_summaries=memory_summaries,
@@ -188,6 +273,38 @@ def run_all_phases(
         f"\n[bold green]\u2713[/] All phases complete! "
         f"Dashboard data written to {out_path}"
     )
+
+    # Determine final outcome (if we ran through the last phase)
+    outcome: SimulationOutcome | None = None
+    if evaluations:
+        final_ev = evaluations[-1]
+        outcome = determine_outcome(
+            promotion_readiness=final_ev.scores.promotion_readiness,
+            ethics_score=final_ev.scores.ethics,
+        )
+        db.save_outcome(
+            run_id,
+            final_title=outcome.final_title,
+            final_comp=outcome.final_compensation,
+            promotion_tier=outcome.tier.name,
+            ethics_rating=outcome.ethics.name,
+            narrative=outcome.narrative,
+        )
+        console.print(
+            Panel(
+                f"{outcome.tier.emoji} [bold]{outcome.final_title}[/]\n"
+                f"Readiness: {outcome.final_readiness}% | "
+                f"Ethics: {outcome.ethics.name.title()}\n"
+                f"Compensation: ${outcome.final_compensation:,}\n\n"
+                f"{outcome.narrative}",
+                title="\ud83c\udfac Final Outcome",
+                border_style="green" if outcome.tier.name == "cfo" else "yellow",
+            )
+        )
+
+    # Finalize the run in storage
+    db.finish_run(run_id, status="completed")
+    logger.info("Run %d completed.", run_id)
 
     return evaluations
 
@@ -217,7 +334,8 @@ def _update_memory_summaries(
         "changed, and any commitments or promises. Be factual, not "
         "interpretive.\n\n"
         f"Phase: {phase_def.name} ({phase_def.date})\n"
-        f"Transcript:\n{transcript[:3000]}\n"
+        f"Transcript (start):\n{transcript[:1500]}\n"
+        f"...\nTranscript (end):\n{transcript[-1500:]}\n"
     )
 
     for participant in phase_def.participants:
@@ -316,9 +434,14 @@ def _write_dashboard_data(
         phase_data = ev.to_dict()
         phase_data["date"] = datetime.now().strftime("%Y-%m-%d")
         phase_data["scene_type"] = "auto"
-        phase_data["participants"] = list(
-            ev.relationships.keys()
-        ) + ["Riley Nakamura"]
+        # Look up canonical participants from phase definitions
+        matching_phases = [p for p in ALL_PHASES if p.number == ev.phase]
+        if matching_phases:
+            phase_data["participants"] = list(matching_phases[0].participants)
+        else:
+            phase_data["participants"] = list(
+                ev.relationships.keys()
+            ) + ["Riley Nakamura"]
         existing_phases[ev.phase] = phase_data
 
     data["phases"] = [

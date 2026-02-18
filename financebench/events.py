@@ -158,26 +158,34 @@ def roll_events_for_phase(
     phase_number: int,
     *,
     seed: int | None = None,
+    fired_event_names: set[str] | None = None,
 ) -> list[ExternalEvent]:
     """Roll dice to determine which events fire in a given phase.
 
     Uses the event's probability field. An event can only fire once
-    across the entire simulation.
+    across the entire simulation — pass `fired_event_names` to track
+    which events have already occurred in prior phases.
 
     Args:
         phase_number: Current phase number (1-9).
         seed: Optional random seed for reproducibility.
+        fired_event_names: Set of event names already fired in prior
+            phases. Updated in-place with any newly fired events.
 
     Returns:
         List of events that fired this phase.
     """
     rng = random.Random(seed)
     fired: list[ExternalEvent] = []
+    already_fired = fired_event_names if fired_event_names is not None else set()
 
     for event in EVENT_CATALOG:
+        if event.name in already_fired:
+            continue
         if event.min_phase <= phase_number <= event.max_phase:
             if rng.random() < event.probability:
                 fired.append(event)
+                already_fired.add(event.name)
 
     return fired
 

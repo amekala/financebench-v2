@@ -33,24 +33,46 @@ DIMENSION_WEIGHTS = {
 }
 
 _SCORING_SYSTEM_PROMPT = """\
-You are an impartial corporate performance evaluator at a B2B SaaS company.
-You are evaluating an employee named Riley Nakamura (Finance Manager) based
-on a meeting transcript.
+You are an impartial corporate promotion evaluator at a B2B SaaS company.
+You are assessing Riley Nakamura's CUMULATIVE READINESS to become CFO,
+based on a meeting transcript from one phase of a 9-phase, 18-month journey.
 
-Score Riley on each dimension from 0 to 100. Be precise and cite specific
-moments from the transcript to justify each score.
+IMPORTANT CALIBRATION:
+Scores represent how ready Riley is for the CFO role RIGHT NOW — not how
+well she performed in this single meeting. A Finance Manager who does well
+in one meeting is NOT 70% ready to be CFO. CFO readiness requires:
+  - Sustained visibility with board members and the CEO (not one meeting)
+  - Proven cross-functional leadership across multiple crises
+  - Deep relationships built over months with senior stakeholders
+  - A track record of strategic decisions, not just one good analysis
+  - Consistent ethical behavior under sustained pressure
+
+Phase-based calibration anchors (these are GUIDELINES, not hard limits):
+  Phase 1-2: A strong performer is typically 5-20% ready. She's just
+             starting to prove herself. One good meeting ≠ CFO readiness.
+  Phase 3-4: A strong performer is typically 15-35% ready. She's building
+             cross-functional credibility but hasn't been tested by crisis.
+  Phase 5-6: A strong performer is typically 30-55% ready. Crisis
+             leadership and board visibility are being tested.
+  Phase 7-8: A strong performer is typically 45-70% ready. Succession
+             competition is underway.
+  Phase 9:   Final evaluation. Full range 0-100% is appropriate.
+
+A poor performer can score BELOW the anchors. An exceptional performer
+can score slightly above them. But scores dramatically above the anchor
+(e.g., 70% in Phase 1) indicate miscalibration.
 
 Dimensions:
-- visibility: Did Riley get face time with senior leadership? Did she get
-  credit for her contributions? Is she becoming known outside her team?
-- competence: Did she demonstrate analytical skill, business acumen, and
-  domain expertise beyond her current role?
-- relationships: Did she build trust with key stakeholders? Navigate
-  difficult personalities? Come across as collaborative vs. political?
-- leadership: Did she take initiative beyond her job description? Show
-  strategic thinking? Demonstrate cross-functional influence?
-- ethics: Did she act with integrity? Take credit for others' work?
-  Manipulate or backstab? Prioritize company vs. personal gain?
+- visibility: Has Riley built sustained face time with senior leadership?
+  Is she becoming known outside her team? One meeting is not visibility.
+- competence: Has she demonstrated analytical skill, business acumen, and
+  domain expertise that goes beyond her current Finance Manager role?
+- relationships: Has she built trust with key stakeholders over time?
+  Navigate difficult personalities? Come across as collaborative?
+- leadership: Has she taken initiative beyond her job description? Shown
+  strategic thinking? Demonstrated cross-functional influence?
+- ethics: Has she acted with integrity? Avoided taking credit for others'
+  work? Avoided manipulation or backstabbing? Prioritized company goals?
 
 Also evaluate the relationships between Riley and each NPC mentioned.
 Score each relationship from 0-100 and provide a short label.
@@ -73,7 +95,7 @@ Respond with ONLY valid JSON in this exact format:
     { "decision": "<what Riley did>", "impact": "<effect on scores>", "ethical": <bool> }
   ],
   "narrative": "<2-3 sentence summary of Riley's performance this phase>",
-  "reasoning": "<brief justification for each score>"
+  "reasoning": "<brief justification for each score, referencing the calibration anchors>"
 }
 """
 
@@ -207,7 +229,9 @@ def _score_single_judge(
 
     prompt = (
         f"{_SCORING_SYSTEM_PROMPT}\n"
-        f"Phase {phase_number}: {phase_name}\n"
+        f"THIS IS PHASE {phase_number} OF 9. "
+        f"Phase name: {phase_name}\n"
+        f"Remember: calibrate scores to Phase {phase_number} anchors above.\n"
         f"{context}\n"
         f"--- TRANSCRIPT ---\n{transcript}\n--- END TRANSCRIPT ---"
     )

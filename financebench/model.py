@@ -29,16 +29,17 @@ from concordia.language_model import language_model
 logger = logging.getLogger(__name__)
 
 _MAX_CHOICE_ATTEMPTS = 20
-_MAX_RETRIES = 5
-_INITIAL_BACKOFF_SECS = 1.0
-_MAX_BACKOFF_SECS = 60.0
+_MAX_RETRIES = 8
+_INITIAL_BACKOFF_SECS = 2.0
+_MAX_BACKOFF_SECS = 120.0
 _BACKOFF_MULTIPLIER = 2.0
+_INTER_CALL_DELAY_SECS = 0.5  # Breathing room between ALL calls
 
 _RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
 _NON_RETRYABLE_STATUS_CODES = {400, 401, 403, 404}
 
 DEFAULT_GATEWAY_URL = (
-    "https://wmtllmgateway.stage.walmart.com/wmtllmgateway"
+    "https://wmtllmgateway.prod.walmart.com/wmtllmgateway"
 )
 
 # ── Provider Detection ──────────────────────────────────────────
@@ -233,6 +234,8 @@ class ElementLanguageModel(language_model.LanguageModel):
                 resp = self._client.post(url, json=body)
 
                 if resp.status_code == 200:
+                    # Brief pause to avoid hammering rate limits
+                    time.sleep(_INTER_CALL_DELAY_SECS)
                     return _extract_text(
                         self._provider, resp.json()
                     )
@@ -250,7 +253,6 @@ class ElementLanguageModel(language_model.LanguageModel):
             except (
                 httpx.TimeoutException,
                 httpx.ConnectError,
-                httpx.ReadTimeout,
             ) as e:
                 last_error = e
                 if attempt == _MAX_RETRIES:
@@ -363,6 +365,7 @@ class ElementLanguageModel(language_model.LanguageModel):
             + "."
         )
 
+        answer = ""  # Avoid UnboundLocalError if all attempts throw
         for attempt in range(_MAX_CHOICE_ATTEMPTS):
             try:
                 answer = self.sample_text(

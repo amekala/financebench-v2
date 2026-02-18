@@ -125,8 +125,8 @@ goes in `system_instruction`.
 
 | Deployment Name | Status | Notes |
 |---|---|---|
-| `gemini-3-pro-preview` | ✅ Latest | Rate-limited but works |
-| `gemini-2.5-pro` | ✅ | Stable flagship |
+| `gemini-3-pro-preview` | ⚠️ Latest | **Severe rate limits** — unusable for simulations |
+| `gemini-2.5-pro` | ✅ Recommended | Stable flagship, no rate issues |
 | `gemini-2.5-flash` | ✅ | Fast |
 
 ---
