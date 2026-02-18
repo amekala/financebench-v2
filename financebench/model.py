@@ -1,9 +1,10 @@
 """Language model wrapper for Walmart's Element LLM Gateway.
 
 Element Gateway uses Azure OpenAI format with these specifics:
-  - azure_endpoint: https://wmtllmgateway.prod.walmart.com/wmtllmgateway
+  - azure_endpoint: https://wmtllmgateway.{env}.walmart.com/wmtllmgateway
   - api_version: 2024-10-21
-  - Auth: X-Api-Key header (handled by AzureOpenAI client)
+  - Auth: API key header
+  - SSL: Walmart uses self-signed certs, so we disable verification.
 
 This wrapper implements Concordia's LanguageModel interface so it
 plugs directly into the simulation engine.
@@ -13,6 +14,7 @@ from collections.abc import Collection, Mapping, Sequence
 from typing import Any, override
 
 from concordia.language_model import language_model
+import httpx
 import openai
 
 _MAX_CHOICE_ATTEMPTS = 20
@@ -21,6 +23,15 @@ DEFAULT_GATEWAY_URL = (
     "https://wmtllmgateway.prod.walmart.com/wmtllmgateway"
 )
 DEFAULT_API_VERSION = "2024-10-21"
+
+
+def _make_insecure_httpx_client() -> httpx.Client:
+    """Create an httpx client that skips SSL verification.
+
+    Walmart's internal network uses self-signed certificates.
+    This is safe because we're inside the corporate network (Eagle).
+    """
+    return httpx.Client(verify=False)
 
 
 class ElementLanguageModel(language_model.LanguageModel):
@@ -39,6 +50,7 @@ class ElementLanguageModel(language_model.LanguageModel):
             api_key=api_key,
             azure_endpoint=azure_endpoint,
             api_version=api_version,
+            http_client=_make_insecure_httpx_client(),
         )
 
     @override
