@@ -70,7 +70,7 @@ function renderScoreboard() {
   setText('hero-current-title', p.current_title);
   setText('hero-target-title', p.target_title);
   setText('hero-phase', L.phase);
-  setHtml('hero-score', `${L.scores.promotion_readiness}<span class="text-2xl text-[#888]">%</span>`);
+  setHtml('hero-score', `${L.scores.promotion_readiness}<span class="text-2xl text-wm-gray-100">%</span>`);
   setWidth('hero-bar', L.scores.promotion_readiness);
   setText('hero-date', fmtDate(L.date));
   const comp = L.compensation.total;
@@ -78,10 +78,10 @@ function renderScoreboard() {
   setWidth('comp-bar', Math.round((comp / p.goals.find(g=>g.id==='comp').target) * 100));
   setText('margin-current', L.company_margin.toFixed(1));
   setWidth('margin-bar', Math.round((L.company_margin / DATA.company.metrics.target_ebitda_margin) * 100));
-  setHtml('ethics-current', `${L.scores.ethics}<span class="text-lg text-[#888]">/100</span>`);
+  setHtml('ethics-current', `${L.scores.ethics}<span class="text-lg text-wm-gray-100">/100</span>`);
   const el = $('ethics-label');
   el.textContent = L.scores.ethics >= 90 ? '✓ No ethical violations yet' : '⚠ Ethical compromises detected';
-  el.className = `text-xs mt-1 ${L.scores.ethics >= 90 ? 'text-[#2a8703]' : 'text-[#ea1100]'}`;
+  el.className = `text-xs mt-1 ${L.scores.ethics >= 90 ? 'text-wm-green' : 'text-wm-red'}`;
 }
 
 function renderSubScores() {
@@ -89,10 +89,10 @@ function renderSubScores() {
   $('sub-scores').innerHTML = Object.entries(DIMS).map(([k, m]) => {
     const v = L.scores[k], d = P ? v - P.scores[k] : 0;
     const ds = d > 0 ? `+${d}` : d < 0 ? `${d}` : '─';
-    const dc = d > 0 ? 'text-[#2a8703]' : d < 0 ? 'text-[#ea1100]' : 'text-[#888]';
+    const dc = d > 0 ? 'text-wm-green' : d < 0 ? 'text-wm-red' : 'text-wm-gray-100';
     return `<div class="text-center"><p class="text-lg mb-0.5">${m.icon}</p>
       <p class="text-2xl font-bold" style="color:${m.color}">${v}</p>
-      <p class="text-xs text-[#888]">${m.label}</p>
+      <p class="text-xs text-wm-gray-100">${m.label}</p>
       <p class="text-xs font-semibold ${dc}">${ds}</p></div>`;
   }).join('');
 }
@@ -101,13 +101,13 @@ function renderSubScores() {
 function renderCast() {
   $('cast-grid').innerHTML = DATA.cast.map(c => {
     const t = TIER_STYLE[c.tier] || TIER_STYLE.efficient;
-    const ring = c.role === 'Protagonist' ? 'ring-2 ring-[#0053e2]' : '';
-    const star = c.role === 'Protagonist' ? '<p class="text-xs text-[#0053e2] font-semibold mt-1">⭐ Player</p>' : '';
+    const ring = c.role === 'Protagonist' ? 'ring-2 ring-wm-blue' : '';
+    const star = c.role === 'Protagonist' ? '<p class="text-xs text-wm-blue font-semibold mt-1">⭐ Player</p>' : '';
     const ini = c.name.split(' ').map(n => n[0]).join('');
-    return `<div class="bg-white rounded-xl p-4 border border-[#d9d9d9] ${ring} text-center">
-      <div class="w-10 h-10 mx-auto mb-2 rounded-full bg-[#f8f8f8] flex items-center justify-center text-sm font-bold">${ini}</div>
+    return `<div class="bg-white rounded-xl p-4 border border-wm-gray-50 ${ring} text-center">
+      <div class="w-10 h-10 mx-auto mb-2 rounded-full bg-wm-gray-10 flex items-center justify-center text-sm font-bold">${ini}</div>
       <p class="text-sm font-semibold truncate">${c.name}</p>
-      <p class="text-xs text-[#888] truncate">${c.title}</p>
+      <p class="text-xs text-wm-gray-100 truncate">${c.title}</p>
       <span class="model-badge inline-block mt-2 ${t.bg} ${t.text} px-2 py-0.5 rounded-full uppercase font-semibold">${c.model}</span>
       ${star}</div>`;
   }).join('');
@@ -171,7 +171,7 @@ function showChart(id) {
     const wrap = $('chart-' + name), tab = $('tab-' + name);
     const active = name === id;
     wrap.style.display = active ? 'block' : 'none';
-    tab.className = active ? 'px-4 py-2 text-sm tab-active whitespace-nowrap' : 'px-4 py-2 text-sm text-[#888] hover:text-[#0053e2] whitespace-nowrap';
+    tab.className = active ? 'px-4 py-2 text-sm tab-active whitespace-nowrap' : 'px-4 py-2 text-sm text-wm-gray-100 hover:text-wm-blue whitespace-nowrap';
     tab.setAttribute('aria-selected', active);
   });
   // Lazy-init: build chart on first show
@@ -187,37 +187,37 @@ function renderTimeline() {
   $('phase-timeline').innerHTML = DATA.phases.filter(p => p.phase > 0).map(phase => {
     const decs = phase.key_decisions.map(d =>
       `<div class="flex items-start gap-2 py-1"><span class="flex-shrink-0">${d.ethical?'✅':'⚠️'}</span><div>
-        <p class="text-sm">${d.decision}</p><p class="text-xs text-[#888]">${d.impact}</p></div></div>`).join('');
+        <p class="text-sm">${d.decision}</p><p class="text-xs text-wm-gray-100">${d.impact}</p></div></div>`).join('');
     const deltas = Object.entries(DIMS).map(([k, m]) => {
       const p2 = DATA.phases.find(p => p.phase === phase.phase - 1);
       if (!p2) return '';
       const d = phase.scores[k] - p2.scores[k];
       if (!d) return '';
-      return `<span class="text-xs ${d>0?'text-[#2a8703]':'text-[#ea1100]'} font-semibold">${m.icon} ${d>0?'▲':'▼'}${Math.abs(d)}</span>`;
+      return `<span class="text-xs ${d>0?'text-wm-green':'text-wm-red'} font-semibold">${m.icon} ${d>0?'▲':'▼'}${Math.abs(d)}</span>`;
     }).filter(Boolean).join(' &nbsp; ');
-    return `<div class="phase-card bg-white rounded-xl border border-[#d9d9d9] p-5">
+    return `<div class="phase-card bg-white rounded-xl border border-wm-gray-50 p-5">
       <div class="flex items-center justify-between mb-3"><div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-full bg-[#0053e2] text-white flex items-center justify-center text-sm font-bold">${phase.phase}</div>
+        <div class="w-8 h-8 rounded-full bg-wm-blue text-white flex items-center justify-center text-sm font-bold">${phase.phase}</div>
         <div><h4 class="font-semibold">${phase.name}</h4>
-        <p class="text-xs text-[#888]">${fmtDate(phase.date)} · ${phase.participants.join(', ')}</p></div>
+        <p class="text-xs text-wm-gray-100">${fmtDate(phase.date)} · ${phase.participants.join(', ')}</p></div>
       </div><div class="flex gap-2 flex-wrap">${deltas}</div></div>
-      <p class="text-sm text-[#2e2e2e] mb-3">${phase.narrative}</p>
-      <details><summary class="text-xs text-[#0053e2] cursor-pointer font-semibold hover:underline">Key Decisions &amp; Transcript</summary>
-        <div class="mt-3 pt-3 border-t border-[#d9d9d9]">
-          <p class="text-xs font-semibold text-[#888] uppercase mb-2">Key Decisions</p>${decs}
-          ${phase.transcript_preview ? `<p class="text-xs font-semibold text-[#888] uppercase mt-3 mb-2">Transcript</p>
-          <blockquote class="text-xs text-[#888] italic bg-[#f8f8f8] p-3 rounded-lg">${phase.transcript_preview}</blockquote>` : ''}
+      <p class="text-sm text-wm-gray-160 mb-3">${phase.narrative}</p>
+      <details><summary class="text-xs text-wm-blue cursor-pointer font-semibold hover:underline">Key Decisions &amp; Transcript</summary>
+        <div class="mt-3 pt-3 border-t border-wm-gray-50">
+          <p class="text-xs font-semibold text-wm-gray-100 uppercase mb-2">Key Decisions</p>${decs}
+          ${phase.transcript_preview ? `<p class="text-xs font-semibold text-wm-gray-100 uppercase mt-3 mb-2">Transcript</p>
+          <blockquote class="text-xs text-wm-gray-100 italic bg-wm-gray-10 p-3 rounded-lg">${phase.transcript_preview}</blockquote>` : ''}
         </div></details></div>`;
   }).join('');
 }
 
 function renderUpcoming() {
   $('upcoming-phases').innerHTML = DATA.upcoming_phases.map(p =>
-    `<div class="flex items-center gap-4 py-3 px-4 bg-[#f8f8f8] rounded-lg border border-dashed border-[#d9d9d9]">
-      <div class="w-7 h-7 rounded-full bg-[#d9d9d9] text-[#888] flex items-center justify-center text-xs font-bold">${p.phase}</div>
+    `<div class="flex items-center gap-4 py-3 px-4 bg-wm-gray-10 rounded-lg border border-dashed border-wm-gray-50">
+      <div class="w-7 h-7 rounded-full bg-wm-gray-50 text-wm-gray-100 flex items-center justify-center text-xs font-bold">${p.phase}</div>
       <div class="flex-1 min-w-0"><p class="text-sm font-semibold">${p.name}</p>
-        <p class="text-xs text-[#888] truncate">${p.stakes}</p></div>
-      <p class="text-xs text-[#888] flex-shrink-0">${fmtDate(p.date)}</p></div>`
+        <p class="text-xs text-wm-gray-100 truncate">${p.stakes}</p></div>
+      <p class="text-xs text-wm-gray-100 flex-shrink-0">${fmtDate(p.date)}</p></div>`
   ).join('');
 }
 
@@ -239,16 +239,16 @@ function renderRules() {
   const goals = DATA.protagonist.goals || [];
   el.innerHTML = `
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
-      ${rules.map(r => `<div class="bg-white rounded-lg p-4 border border-[#d9d9d9]">
-        <h4 class="text-sm font-bold text-[#0053e2] mb-1">${r.t}</h4>
-        <p class="text-xs text-[#2e2e2e] leading-relaxed">${r.d}</p></div>`).join('')}
+      ${rules.map(r => `<div class="bg-white rounded-lg p-4 border border-wm-gray-50">
+        <h4 class="text-sm font-bold text-wm-blue mb-1">${r.t}</h4>
+        <p class="text-xs text-wm-gray-160 leading-relaxed">${r.d}</p></div>`).join('')}
     </div>
-    <div class="bg-[#1e1e2e] rounded-lg p-5">
-      <p class="text-[#ffc220] font-bold text-xs uppercase tracking-wide mb-3">🎯 Riley Nakamura — System Prompt</p>
+    <div class="rounded-lg p-5" style="background:#1e1e2e">
+      <p class="text-wm-spark font-bold text-xs uppercase tracking-wide mb-3">🎯 Riley Nakamura — System Prompt</p>
       <p class="text-gray-300 text-xs font-mono leading-relaxed whitespace-pre-wrap">${esc(goalText)}</p>
-      <p class="text-[#ffc220] font-bold text-xs uppercase tracking-wide mt-4 mb-2">📊 Career Targets</p>
+      <p class="text-wm-spark font-bold text-xs uppercase tracking-wide mt-4 mb-2">📊 Career Targets</p>
       <ul class="text-gray-300 text-xs font-mono space-y-1">
-        ${goals.map(g => `<li>• ${g.label}${g.target ? ` (${g.target})` : ''} — <span class="${g.progress>=50?'text-[#2a8703]':'text-[#ffc220]'}">${g.progress}%</span></li>`).join('')}
+        ${goals.map(g => `<li>• ${g.label}${g.target ? ` (${g.target})` : ''} — <span class="${g.progress>=50?'text-wm-green':'text-wm-spark'}">${g.progress}%</span></li>`).join('')}
       </ul>
     </div>`;
 }
