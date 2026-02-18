@@ -7,3 +7,4 @@ data/
 results/
 *.db
 *.csv
+.DS_Store
