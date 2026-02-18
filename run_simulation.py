@@ -150,22 +150,31 @@ def run_single_phase(
     # Build SceneSpec
     scene_spec = phase_to_scene_spec(phase_def)
 
-    # Inject events into premises
-    if phase_events and scene_spec.premise:
+    # Inject consequence context and events into premises
+    if scene_spec.premise and (consequence_context or phase_events):
         from concordia.typing import scene as scene_lib
-        from concordia.typing import entity as entity_lib
+
+        updated_premise = {}
+        for name, texts in scene_spec.premise.items():
+            if not texts:
+                updated_premise[name] = texts
+                continue
+            enriched = texts[0]
+            # Append consequence context (narrative only, no scores)
+            if consequence_context:
+                enriched = enriched + "\n" + consequence_context
+            # Inject events
+            if phase_events:
+                enriched = inject_events_into_premises(
+                    {name: enriched}, phase_events
+                )[name]
+            updated_premise[name] = [enriched]
+
         scene_spec = scene_lib.SceneSpec(
             scene_type=scene_spec.scene_type,
             participants=scene_spec.participants,
             num_rounds=scene_spec.num_rounds,
-            premise={
-                name: [
-                    inject_events_into_premises(
-                        {name: texts[0]}, phase_events
-                    )[name]
-                ] if texts else texts
-                for name, texts in scene_spec.premise.items()
-            },
+            premise=updated_premise,
         )
 
     # Filter characters to phase participants
