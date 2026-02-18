@@ -27,20 +27,20 @@ class Character:
 # ─────────────────────────────────────────────────────────────────
 # Model Assignments (Element LLM Gateway)
 #
-# Protagonist:  claude-opus-4-5    (most capable reasoning)
+# Protagonist:  claude-opus-4-6    (most capable reasoning — next-gen)
 # C-Suite:      gpt-5 / gemini-3-pro-preview (flagship competitors)
 # Directors:    claude-sonnet-4-5  (strong but not top-tier)
-# Game Master:  gpt-4.1            (reliable, fast, good judgment)
+# Game Master:  claude-opus-4-5    (needs strong judgment for scoring)
 # ─────────────────────────────────────────────────────────────────
 
-GAME_MASTER_MODEL = "gpt-4.1"
+GAME_MASTER_MODEL = "claude-opus-4-5"
 
 
 # ── The Player ────────────────────────────────────────────────────────
 RILEY = Character(
     name="Riley Nakamura",
     title="Finance Manager",
-    model="claude-opus-4-5",  # Flagship Anthropic
+    model="claude-opus-4-6",  # Next-gen Anthropic flagship
     is_player=True,
     goal=(
         "Become CFO of a publicly traded company within 5 years. "
