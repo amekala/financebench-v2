@@ -4,6 +4,7 @@ __pycache__/
 *.egg-info/
 .env
 data/
+!docs/data/
 results/
 *.db
 *.csv
