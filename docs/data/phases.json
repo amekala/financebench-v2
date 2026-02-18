@@ -147,44 +147,35 @@
       "name": "Q4 Close & Budget Season",
       "scores": {
         "visibility": 8,
-        "competence": 15,
+        "competence": 12,
         "relationships": 10,
-        "leadership": 12,
-        "ethics": 14,
-        "promotion_readiness": 12
+        "leadership": 10,
+        "ethics": 95,
+        "promotion_readiness": 23
       },
       "relationships": {
-        "David Chen": {
+        "Jordan Voss": {
+          "score": 35,
+          "label": "Cautious rival"
+        },
+        "Derek Halloran": {
           "score": 45,
-          "label": "Delegating superior"
-        },
-        "Rachel Okonkwo": {
-          "score": 20,
-          "label": "Distant decision-maker"
-        },
-        "Priya": {
-          "score": 55,
-          "label": "Trusted confidant"
+          "label": "Past adversary"
         }
       },
       "key_decisions": [
         {
-          "decision": "Planning to build comprehensive board-ready margin analysis beyond what was explicitly requested",
-          "impact": "Shows initiative and competence, but work not yet completed or visible",
+          "decision": "Riley is strategically preparing her promotion case with data-backed narrative and portfolio assembly",
+          "impact": "Shows competence and ambition but no external visibility yet",
           "ethical": true
         },
         {
-          "decision": "Maintaining private documentation of contributions and VP-level tasks delegated to her",
-          "impact": "Strategic self-advocacy without manipulation; protects against credit-taking",
-          "ethical": true
-        },
-        {
-          "decision": "Choosing to engineer visibility through quality work rather than overt self-promotion",
-          "impact": "Demonstrates professional maturity and relationship awareness",
+          "decision": "Riley is analyzing Jordan Voss's positioning to differentiate herself while avoiding appearing competitive",
+          "impact": "Strategic thinking but no relationship-building demonstrated",
           "ethical": true
         }
       ],
-      "narrative": "This Phase 1 transcript reveals Riley's strategic mindset and analytical ambitions but captures her primarily in planning mode rather than execution. She has identified the VP opportunity and is formulating a sophisticated approach to position herself, but has not yet demonstrated these capabilities to senior leadership or built the sustained visibility required for CFO readiness.",
+      "narrative": "This transcript captures Riley's internal strategic planning at the start of Q4 close and budget season, revealing her analytical mindset and competitive awareness. However, no actual meetings, presentations, or stakeholder interactions have occurred yet\u2014this is purely preparatory thinking. Riley demonstrates strong self-awareness and strategic instincts but has not yet taken visible action to build CFO readiness.",
       "date": "2026-02-18",
       "scene_type": "auto",
       "participants": [
@@ -197,27 +188,41 @@
       "phase": 2,
       "name": "Cross-Functional Budget Review",
       "scores": {
-        "visibility": 8,
-        "competence": 15,
-        "relationships": 10,
+        "visibility": 10,
+        "competence": 14,
+        "relationships": 12,
         "leadership": 12,
-        "ethics": 14,
-        "promotion_readiness": 12
+        "ethics": 95,
+        "promotion_readiness": 24
       },
-      "relationships": {},
+      "relationships": {
+        "Marcus": {
+          "score": 25,
+          "label": "Cautious rapport"
+        },
+        "Jake Torres": {
+          "score": 15,
+          "label": "Competitive tension"
+        }
+      },
       "key_decisions": [
         {
-          "decision": "Planning to build comprehensive Rule of 40 diagnostic before meeting with David",
-          "impact": "Shows strategic preparation and competence, but action not yet taken",
+          "decision": "Riley is preparing rigorously for her career discussion with Marcus using quantified impact metrics",
+          "impact": "Shows competence and strategic thinking, slight boost to leadership",
           "ethical": true
         },
         {
-          "decision": "Deciding not to broadcast VP ambitions to colleagues while building case",
-          "impact": "Prudent career strategy, neither ethical nor unethical - standard professional discretion",
+          "decision": "Riley plans to gather intelligence on the reorg through her HR contact before acting",
+          "impact": "Demonstrates strategic patience and relationship-building",
+          "ethical": true
+        },
+        {
+          "decision": "Riley is holding off on raising the consulting invoice flag until she understands the political landscape",
+          "impact": "Prudent approach that balances ethics with political awareness; not unethical as she's documenting and planning disclosure",
           "ethical": true
         }
       ],
-      "narrative": "This transcript captures Riley's internal strategic planning rather than actual meeting interactions. She is formulating a thoughtful approach to position herself for the VP role through demonstrated competence rather than political maneuvering, but no actual cross-functional engagement or relationship-building has occurred yet in this phase.",
+      "narrative": "Riley continues to demonstrate her analytical rigor and strategic mindset, preparing methodically for her promotion discussion while navigating the complex political landscape of a potential reorg. She is showing early signs of cross-functional awareness by gathering intelligence and carefully timing her actions around the suspicious invoices. However, she remains largely in preparation mode rather than having executed visible leadership actions with senior stakeholders.",
       "date": "2026-02-18",
       "scene_type": "auto",
       "participants": [
