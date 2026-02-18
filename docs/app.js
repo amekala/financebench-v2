@@ -54,12 +54,13 @@ function getRunDate(experiment) {
 async function init() {
   try {
     const base = document.querySelector('script[src$="app.js"]')?.src.replace(/app\.js$/, '') || './';
-    const res = await fetch(base + 'data/phases.json');
+    const cacheBust = '?v=' + Date.now();
+    const res = await fetch(base + 'data/results.json' + cacheBust);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     D = await res.json();
   } catch (err) {
     console.error('Data load failed:', err);
-    setHtml('analysis', '<p class="text-red-600">⚠ Failed to load phases.json</p>');
+    setHtml('analysis', '<p class="text-red-600">⚠ Failed to load results.json</p>');
     return;
   }
   renderOutcome();
