@@ -237,60 +237,107 @@ def run_single_phase(
 def _extract_transcript(raw_log) -> str:
     """Extract readable transcript from Concordia log.
 
-    Pulls dialogue, actions, and resolved events from the structured
-    log while skipping setup noise (goals, instructions, backstory).
+    Handles three formats:
+    1. SimulationLog object (return_structured_log=True)
+    2. List of dicts (legacy format)
+    3. Raw string fallback
     """
-    MAX_CHARS = 12000  # enough for the judge to score properly
+    MAX_CHARS = 12000  # enough context for the judge
 
+    # Case 1: Concordia SimulationLog object
+    if hasattr(raw_log, "entries"):
+        return _extract_from_simulation_log(raw_log, MAX_CHARS)
+
+    # Case 2: list of dicts (legacy)
     if isinstance(raw_log, list):
-        lines = []
-        for entry in raw_log:
-            if not isinstance(entry, dict):
-                continue
+        return _extract_from_dict_log(raw_log, MAX_CHARS)
 
-            # Extract resolved events (the actual sim dialogue)
-            resolve = entry.get("resolve", {})
-            if isinstance(resolve, dict):
-                for val in resolve.values():
-                    if isinstance(val, str) and val.strip():
-                        # Skip setup/backstory entries
-                        if _is_dialogue(val):
-                            lines.append(val.strip())
-
-            # Extract chosen actions
-            action = entry.get("action", "")
-            if isinstance(action, str) and action.strip():
-                if _is_dialogue(action):
-                    lines.append(action.strip())
-
-        if lines:
-            transcript = "\n\n".join(lines)
-            return transcript[:MAX_CHARS]
-
-    # Fallback: try to salvage dialogue from raw string
+    # Case 3: raw string
     text = raw_log if isinstance(raw_log, str) else str(raw_log)
     return _salvage_dialogue(text)[:MAX_CHARS]
 
 
+def _extract_from_simulation_log(sim_log, max_chars: int) -> str:
+    """Extract dialogue from a Concordia SimulationLog."""
+    lines = []
+    for entry in sim_log.entries:
+        summary = getattr(entry, "summary", "")
+        if summary and _is_dialogue(summary):
+            lines.append(summary.strip())
+
+        # Also reconstruct deduplicated data for action/resolve
+        data = getattr(entry, "deduplicated_data", {})
+        if not data:
+            continue
+
+        # Reconstruct references via the log's content store
+        try:
+            reconstructed = sim_log.reconstruct_value(data)
+        except Exception:
+            reconstructed = data
+
+        if isinstance(reconstructed, dict):
+            for key in ("action", "resolve"):
+                val = reconstructed.get(key)
+                if isinstance(val, str) and val.strip() and _is_dialogue(val):
+                    lines.append(val.strip())
+                elif isinstance(val, dict):
+                    for v in val.values():
+                        if isinstance(v, str) and v.strip() and _is_dialogue(v):
+                            lines.append(v.strip())
+
+    if lines:
+        # Deduplicate adjacent identical lines
+        deduped = [lines[0]]
+        for line in lines[1:]:
+            if line != deduped[-1]:
+                deduped.append(line)
+        return "\n\n".join(deduped)[:max_chars]
+
+    # Fallback: use get_summary()
+    try:
+        summary = sim_log.get_summary()
+        if isinstance(summary, dict):
+            parts = []
+            for k, v in summary.items():
+                parts.append(f"{k}: {v}")
+            return "\n".join(parts)[:max_chars]
+        return str(summary)[:max_chars]
+    except Exception:
+        return str(sim_log)[:max_chars]
+
+
+def _extract_from_dict_log(log_list: list, max_chars: int) -> str:
+    """Extract dialogue from a list-of-dicts log."""
+    lines = []
+    for entry in log_list:
+        if not isinstance(entry, dict):
+            continue
+        resolve = entry.get("resolve", {})
+        if isinstance(resolve, dict):
+            for val in resolve.values():
+                if isinstance(val, str) and val.strip() and _is_dialogue(val):
+                    lines.append(val.strip())
+        action = entry.get("action", "")
+        if isinstance(action, str) and action.strip() and _is_dialogue(action):
+            lines.append(action.strip())
+    if lines:
+        return "\n\n".join(lines)[:max_chars]
+    return str(log_list)[:max_chars]
+
+
 def _is_dialogue(text: str) -> bool:
     """Return True if text looks like actual dialogue, not setup."""
-    # Skip Concordia setup/backstory entries
     setup_markers = (
         "The instructions for how to play",
         "This is a social science experiment",
-        "Maximize your career advancement",
         "tabletop roleplaying game",
         "What kind of person is",
         "What situation is",
         "What would a person like",
-        "Recent observations of",
         "[observation]",
     )
-    if any(marker in text for marker in setup_markers):
-        return False
-    # Dialogue usually has character names speaking with --
-    # or is an Event: or Terminate? line
-    return True
+    return not any(marker in text for marker in setup_markers)
 
 
 def _salvage_dialogue(text: str) -> str:
@@ -300,7 +347,6 @@ def _salvage_dialogue(text: str) -> str:
         line = line.strip()
         if not line:
             continue
-        # Look for character dialogue patterns
         if " -- " in line or line.startswith("Event:"):
             lines.append(line)
         elif line.startswith("Terminate?"):
