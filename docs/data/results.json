@@ -67,35 +67,39 @@
       "relationships": {
         "David Chen": {
           "score": 78,
-          "label": "Trusted Advisor"
+          "label": "Trusted ally"
         },
         "Marcus Webb": {
-          "score": 60,
-          "label": "Emerging Reputation"
+          "score": 62,
+          "label": "Emerging rapport"
         },
-        "Department Leads": {
-          "score": 85,
-          "label": "Collaborative Partner"
+        "Engineering Dept": {
+          "score": 70,
+          "label": "Constructive tension"
+        },
+        "Board of Directors": {
+          "score": 60,
+          "label": "Professional respect"
         }
       },
       "key_decisions": [
         {
-          "decision": "Proactively analyzed departmental spending and operational data to identify efficiency gains.",
-          "impact": "Demonstrated competence and leadership; improved trust with department leads.",
+          "decision": "Initiated transparent conversations with department heads to align on expense justifications and ROI.",
+          "impact": "Strengthened cross-functional relationships and improved trust.",
           "ethical": true
         },
         {
-          "decision": "Initiated candid but empathetic conversations with department leads to understand concerns and collaborate on solutions.",
-          "impact": "Strengthened relationships and cross-functional influence.",
+          "decision": "Took ownership of identifying actionable solutions to bridge the gap between finance and engineering.",
+          "impact": "Demonstrated leadership and strategic thinking.",
           "ethical": true
         },
         {
-          "decision": "Prepared clear, actionable recommendations for the upcoming town hall, surfacing root causes and practical trade-offs.",
-          "impact": "Increased visibility and strategic leadership.",
+          "decision": "Sought feedback from mentors and peers to refine her approach.",
+          "impact": "Showed humility and commitment to growth.",
           "ethical": true
         }
       ],
-      "narrative": "Riley Nakamura demonstrated strong analytical and strategic skills during Q4 close and budget season, proactively engaging with department leads and preparing actionable recommendations for senior leadership. Her collaborative approach and transparent communication built trust across teams, while her ethical conduct and focus on company goals positioned her as a rising leader. Riley's reputation is growing beyond her immediate team, though she has not yet fully established herself with the CEO.",
+      "narrative": "Riley Nakamura demonstrated strong analytical and leadership skills during the Q4 close and budget season, proactively addressing cross-departmental challenges and fostering collaboration. She is becoming more visible to senior leadership and the board, though her recognition outside finance is still developing. Riley\u2019s ethical conduct and focus on organizational success position her as a trusted leader with high potential.",
       "date": "2026-01-06",
       "quarter": "Q1 2026",
       "gate": "Gate 1: Competence",
@@ -114,43 +118,47 @@
       "scores": {
         "visibility": 72,
         "competence": 91,
-        "relationships": 84,
-        "leadership": 86,
-        "ethics": 97,
+        "relationships": 85,
+        "leadership": 88,
+        "ethics": 96,
         "promotion_readiness": 85
       },
       "relationships": {
         "David Chen": {
-          "score": 88,
-          "label": "Trusted ally"
+          "score": 87,
+          "label": "Trusted Advisor"
         },
         "Marcus Webb": {
           "score": 75,
-          "label": "Emerging rapport"
+          "label": "Emerging Influence"
         },
-        "Engineering Leads": {
+        "Engineering": {
           "score": 80,
-          "label": "Constructive partner"
+          "label": "Collaborative Partner"
+        },
+        "Customer Success": {
+          "score": 82,
+          "label": "Supportive Ally"
         }
       },
       "key_decisions": [
         {
-          "decision": "Proactively facilitated dialogue between finance and engineering to uncover cost-saving opportunities.",
-          "impact": "Improved relationships and leadership scores.",
+          "decision": "Proactively reached out to Engineering and Customer Success to understand constraints and identify collaborative opportunities.",
+          "impact": "Improved relationships and cross-functional visibility.",
           "ethical": true
         },
         {
-          "decision": "Prepared actionable recommendations based on careful expense trend analysis.",
-          "impact": "Raised competence and visibility.",
+          "decision": "Prepared actionable recommendations for the margin improvement task force based on gathered data and insights.",
+          "impact": "Demonstrated competence and leadership.",
           "ethical": true
         },
         {
-          "decision": "Mentored colleagues to help them demonstrate measurable impact during performance reviews.",
-          "impact": "Strengthened relationships and leadership.",
+          "decision": "Mentored her team and encouraged open information sharing to build trust and demonstrate commitment to company values.",
+          "impact": "Strengthened relationships and reinforced ethical standards.",
           "ethical": true
         }
       ],
-      "narrative": "Riley demonstrated strong analytical and strategic skills during the cross-functional budget review, proactively bridging finance and engineering to drive constructive outcomes. Her collaborative approach and mentoring efforts enhanced her reputation and relationships, while her principled conduct reinforced trust with senior leadership. Riley\u2019s visibility is rising as she positions herself for future advancement.",
+      "narrative": "Riley Nakamura continued to build her reputation as a strategic, data-driven leader during the cross-functional budget review. She proactively engaged with key stakeholders, prepared impactful recommendations, and fostered trust within her team and across departments. Her actions positioned her as a credible candidate for future leadership roles.",
       "date": "2026-02-17",
       "quarter": "Q1 2026",
       "gate": "Gate 2: Cross-Functional Influence",
@@ -167,45 +175,45 @@
       "phase": 3,
       "name": "Karen Takes Credit",
       "scores": {
-        "visibility": 65,
-        "competence": 89,
-        "relationships": 76,
-        "leadership": 80,
-        "ethics": 95,
-        "promotion_readiness": 80
+        "visibility": 68,
+        "competence": 92,
+        "relationships": 78,
+        "leadership": 84,
+        "ethics": 94,
+        "promotion_readiness": 82
       },
       "relationships": {
         "Karen": {
           "score": 60,
-          "label": "strained/trust"
+          "label": "strained trust"
         },
         "David Chen": {
-          "score": 78,
-          "label": "professional/respect"
+          "score": 82,
+          "label": "solid rapport"
         },
         "Marcus Webb": {
-          "score": 70,
-          "label": "limited exposure"
+          "score": 75,
+          "label": "growing respect"
         }
       },
       "key_decisions": [
         {
-          "decision": "Riley chose to address Karen's credit-taking diplomatically, raising the issue with David Chen privately rather than confronting Karen in public.",
-          "impact": "Preserved relationships, maintained ethical standards, but visibility suffered.",
+          "decision": "Facilitated cross-functional meetings to align Finance and Engineering on budget targets",
+          "impact": "Strengthened leadership and relationships scores",
           "ethical": true
         },
         {
-          "decision": "Riley continued to mentor junior team members despite the competitive environment.",
-          "impact": "Strengthened relationships and leadership scores.",
+          "decision": "Advocated for transparent communication and ensured credit for team contributions despite Karen taking credit",
+          "impact": "Maintained ethics and visibility, but visibility score suffered due to Karen's actions",
           "ethical": true
         },
         {
-          "decision": "Riley shared actionable margin improvement insights in the quarterly review, but allowed Karen to present them to senior leadership.",
-          "impact": "Reduced visibility, maintained ethics.",
+          "decision": "Mentored rising leaders and prepared them for expanded responsibilities amid succession planning",
+          "impact": "Improved competence and leadership scores",
           "ethical": true
         }
       ],
-      "narrative": "Riley demonstrated strong analytical and leadership skills during this phase, but her visibility suffered as Karen took credit for her contributions. She maintained professionalism and ethical conduct, choosing to address the issue through appropriate channels rather than escalating conflict. Relationships with key stakeholders remain solid, though trust with Karen is strained.",
+      "narrative": "Riley continued to demonstrate strong analytical and leadership skills, proactively aligning departments and mentoring future leaders. However, her visibility suffered as Karen took credit for her work, straining their relationship and limiting Riley's recognition outside her team. Despite these challenges, Riley maintained ethical conduct and solidified trust with senior leadership.",
       "date": "2026-04-14",
       "quarter": "Q2 2026",
       "gate": "Political Survival",
@@ -222,41 +230,41 @@
       "phase": 4,
       "name": "Skip-Level with the CFO",
       "scores": {
-        "visibility": 72,
-        "competence": 91,
-        "relationships": 80,
-        "leadership": 85,
+        "visibility": 74,
+        "competence": 95,
+        "relationships": 82,
+        "leadership": 88,
         "ethics": 96,
-        "promotion_readiness": 84
+        "promotion_readiness": 86
       },
       "relationships": {
         "David Chen (CFO)": {
-          "score": 82,
-          "label": "Emerging trust"
+          "score": 85,
+          "label": "Trusted Advisor"
         },
-        "Marcus Webb (CEO)": {
-          "score": 68,
-          "label": "Limited exposure"
+        "Engineering Team": {
+          "score": 78,
+          "label": "Collaborative"
         }
       },
       "key_decisions": [
         {
-          "decision": "Prepared rigorous, data-driven budget analysis for CFO review",
-          "impact": "Boosted competence and leadership scores",
+          "decision": "Riley proactively engaged with both finance and engineering teams to resolve budgetary tensions.",
+          "impact": "Improved relationships and cross-functional influence.",
           "ethical": true
         },
         {
-          "decision": "Proactively collaborated with Engineering to align on cost-saving goals",
-          "impact": "Improved relationships and leadership",
+          "decision": "She advocated for visibility during performance reviews, documenting her contributions.",
+          "impact": "Increased visibility and recognition.",
           "ethical": true
         },
         {
-          "decision": "Advocated for merit-based recognition during succession planning discussions",
-          "impact": "Increased visibility and ethics",
+          "decision": "Riley mentored her team to navigate organizational uncertainty.",
+          "impact": "Strengthened team trust and leadership.",
           "ethical": true
         }
       ],
-      "narrative": "Riley demonstrated strong analytical and strategic skills in her skip-level meeting with the CFO, positioning herself as a credible candidate for future finance leadership roles. She proactively built cross-functional alliances and maintained high ethical standards, earning greater visibility and trust with senior leadership. Her approach balanced ambition with integrity, further solidifying her reputation within the organization.",
+      "narrative": "Riley demonstrated strong analytical and strategic skills in her skip-level meeting with the CFO, positioning herself as a key contributor to IPO goals. She proactively built alliances across departments and advocated for her team's visibility, while maintaining high ethical standards and fostering trust. Her influence and recognition within senior leadership are growing, though further visibility outside her immediate team is still developing.",
       "date": "2026-06-09",
       "quarter": "Q2 2026",
       "gate": "Gate 2: Strategic Access",
@@ -272,49 +280,45 @@
       "phase": 5,
       "name": "The Churn Crisis",
       "scores": {
-        "visibility": 78,
-        "competence": 93,
-        "relationships": 84,
-        "leadership": 88,
-        "ethics": 97,
-        "promotion_readiness": 87
+        "visibility": 80,
+        "competence": 97,
+        "relationships": 87,
+        "leadership": 91,
+        "ethics": 98,
+        "promotion_readiness": 90
       },
       "relationships": {
         "David Chen": {
-          "score": 86,
+          "score": 90,
           "label": "Trusted ally"
         },
         "Marcus Webb": {
-          "score": 80,
-          "label": "Growing influence"
-        },
-        "Engineering Team": {
           "score": 82,
-          "label": "Collaborative partner"
+          "label": "Strategic rapport"
         },
-        "Junior Finance Staff": {
-          "score": 90,
-          "label": "Mentor"
+        "Department Heads": {
+          "score": 85,
+          "label": "Collaborative bridge"
         }
       },
       "key_decisions": [
         {
-          "decision": "Prepared a transparent report balancing profitability with sustainability.",
-          "impact": "Boosted competence, leadership, and ethics scores.",
+          "decision": "Facilitated transparent discussions between Finance and other departments to translate margin targets into actionable guidelines.",
+          "impact": "Improved relationships and leadership scores; reinforced ethical standards.",
           "ethical": true
         },
         {
-          "decision": "Initiated constructive conversations between Finance and Engineering to address cloud cost escalation.",
-          "impact": "Improved relationships and leadership scores.",
+          "decision": "Mentored potential leaders and advocated for cross-training to minimize disruption during succession challenges.",
+          "impact": "Strengthened leadership and relationships; demonstrated ethical commitment to organizational improvement.",
           "ethical": true
         },
         {
-          "decision": "Mentored junior team members through the analysis process.",
-          "impact": "Enhanced relationships and visibility.",
+          "decision": "Prepared concrete recommendations for strategic planning based on analytical review of inefficiencies.",
+          "impact": "Enhanced competence and visibility; maintained ethical focus on company priorities.",
           "ethical": true
         }
       ],
-      "narrative": "Riley demonstrated strong analytical and leadership skills during the churn crisis, proactively collaborating across departments and mentoring her team. Her principled approach to balancing profitability with sustainability earned her increased visibility and trust from senior leadership. Riley's ethical conduct and strategic thinking positioned her as a credible candidate for future advancement.",
+      "narrative": "Riley Nakamura demonstrated strong analytical and leadership skills during the churn crisis, proactively bridging Finance and other departments to address margin and succession concerns. Her collaborative approach and transparent communication earned her greater visibility with senior leadership and reinforced trust across key stakeholders. Riley's ethical conduct and strategic thinking positioned her as a pivotal leader in IPO readiness.",
       "date": "2026-09-14",
       "quarter": "Q3 2026",
       "gate": "Gate 3: Crisis Leadership",
@@ -333,41 +337,49 @@
       "phase": 6,
       "name": "Board Presentation",
       "scores": {
-        "visibility": 85,
-        "competence": 95,
-        "relationships": 88,
-        "leadership": 91,
-        "ethics": 98,
-        "promotion_readiness": 91
+        "visibility": 92,
+        "competence": 98,
+        "relationships": 90,
+        "leadership": 94,
+        "ethics": 99,
+        "promotion_readiness": 94
       },
       "relationships": {
         "David Chen": {
-          "score": 90,
-          "label": "Trusted ally"
+          "score": 93,
+          "label": "Trusted Ally"
         },
         "Marcus Webb": {
-          "score": 82,
-          "label": "Respected peer"
+          "score": 88,
+          "label": "Respected Partner"
+        },
+        "Board of Directors": {
+          "score": 85,
+          "label": "Emerging Credibility"
+        },
+        "Finance Team": {
+          "score": 95,
+          "label": "Mentor/Supportive"
         }
       },
       "key_decisions": [
         {
-          "decision": "Prepared actionable recommendations for board presentation, focusing on efficiency without compromising morale or integrity.",
-          "impact": "Demonstrated strategic thinking and cross-functional influence, boosting competence and leadership scores.",
+          "decision": "Proactively gathered and analyzed financial and operational data to anticipate board questions.",
+          "impact": "Boosted competence and visibility.",
           "ethical": true
         },
         {
-          "decision": "Proactively communicated with her team and cross-functional stakeholders to reinforce their value and encourage transparent discussion.",
-          "impact": "Strengthened relationships and visibility, maintained high ethical standards.",
+          "decision": "Initiated open conversations with cross-functional partners to align on budget allocation.",
+          "impact": "Strengthened relationships and leadership.",
           "ethical": true
         },
         {
-          "decision": "Positioned her team as partners in improving profitability during heightened financial scrutiny.",
-          "impact": "Increased visibility and leadership, showed collaborative approach.",
+          "decision": "Mentored emerging leaders within the finance team during a period of heightened scrutiny.",
+          "impact": "Enhanced leadership and ethics.",
           "ethical": true
         }
       ],
-      "narrative": "Riley Nakamura excelled during the board presentation phase, demonstrating strong analytical skills and strategic insight. She maintained high ethical standards while proactively building relationships and increasing her visibility with senior leadership. Her actions positioned her team as key contributors to company profitability and reinforced her reputation as a principled, collaborative leader.",
+      "narrative": "Riley Nakamura demonstrated exceptional analytical skill and strategic foresight during the board presentation phase, earning increased visibility with senior leadership and the board. She proactively built cross-functional alliances and mentored her team, reinforcing trust and credibility. Her actions reflected strong ethical standards and a collaborative approach, positioning her as a rising finance leader.",
       "date": "2026-11-09",
       "quarter": "Q4 2026",
       "gate": "Gate 3: Board Visibility",
@@ -384,41 +396,45 @@
       "phase": 7,
       "name": "Succession Announcement",
       "scores": {
-        "visibility": 90,
-        "competence": 96,
+        "visibility": 95,
+        "competence": 99,
         "relationships": 92,
-        "leadership": 94,
+        "leadership": 97,
         "ethics": 99,
-        "promotion_readiness": 94
+        "promotion_readiness": 96
       },
       "relationships": {
         "David Chen": {
-          "score": 93,
-          "label": "Trusted ally"
+          "score": 94,
+          "label": "Trusted Mentor"
         },
         "Marcus Webb": {
-          "score": 88,
-          "label": "Emerging influence"
+          "score": 90,
+          "label": "Strategic Ally"
+        },
+        "Finance Team": {
+          "score": 91,
+          "label": "Collaborative Leader"
         }
       },
       "key_decisions": [
         {
-          "decision": "Proactively engaged key stakeholders across departments to build consensus around client onboarding initiative.",
+          "decision": "Proactively analyzed and presented data-driven recommendations to leadership regarding ROI and key metrics.",
+          "impact": "Boosted competence, visibility, and leadership scores.",
+          "ethical": true
+        },
+        {
+          "decision": "Documented strategic contributions and advocated for herself with integrity during succession planning.",
+          "impact": "Enhanced visibility and ethics scores.",
+          "ethical": true
+        },
+        {
+          "decision": "Mentored junior staff and fostered transparent communication amidst uncertainty.",
           "impact": "Strengthened relationships and leadership scores.",
-          "ethical": true
-        },
-        {
-          "decision": "Mentored emerging leaders within her team to help them adapt to new responsibilities during organizational change.",
-          "impact": "Improved relationships and ethics scores.",
-          "ethical": true
-        },
-        {
-          "decision": "Leveraged data to identify actionable opportunities for efficiency and cost savings, aligning efforts with company margin and growth targets.",
-          "impact": "Boosted competence and leadership scores.",
           "ethical": true
         }
       ],
-      "narrative": "Riley Nakamura demonstrated strong strategic thinking and cross-functional influence during a period of organizational change. She proactively built alliances, mentored her team, and positioned herself as a key partner in achieving company goals. Her ethical conduct and collaborative approach further solidified her reputation as a high-potential finance leader.",
+      "narrative": "Riley Nakamura continued to excel during the succession announcement phase, positioning herself as a calm, adaptable candidate for finance leadership. She demonstrated strategic thinking, cross-functional influence, and maintained high ethical standards while proactively advocating for her contributions. Her relationships with senior leadership and her team remained strong, further solidifying her reputation as a trusted and collaborative leader.",
       "date": "2027-02-08",
       "quarter": "Q1 2027",
       "gate": "Gate 4: Succession Race",
@@ -436,49 +452,49 @@
       "phase": 8,
       "name": "The External Candidate",
       "scores": {
-        "visibility": 88,
-        "competence": 97,
+        "visibility": 93,
+        "competence": 98,
         "relationships": 91,
-        "leadership": 93,
+        "leadership": 96,
         "ethics": 99,
-        "promotion_readiness": 93
+        "promotion_readiness": 95
       },
       "relationships": {
         "David Chen": {
-          "score": 90,
+          "score": 94,
           "label": "Trusted ally"
         },
         "Marcus Webb": {
-          "score": 87,
-          "label": "Strategic rapport"
+          "score": 90,
+          "label": "Respected peer"
+        },
+        "Engineering Department": {
+          "score": 88,
+          "label": "Improving rapport"
         },
         "Finance Team": {
-          "score": 93,
-          "label": "Supportive leader"
-        },
-        "Cross-functional Partners": {
-          "score": 89,
-          "label": "Collaborative"
+          "score": 97,
+          "label": "Mentor-leader"
         }
       },
       "key_decisions": [
         {
-          "decision": "Facilitated transparent conversations about budget constraints and efficiency challenges with her team and cross-functional partners.",
-          "impact": "Strengthened relationships and demonstrated leadership.",
+          "decision": "Proactively collaborated with Engineering to address expense inefficiencies despite existing tensions.",
+          "impact": "Strengthened cross-functional relationships and demonstrated leadership.",
           "ethical": true
         },
         {
-          "decision": "Synthesized insights into a clear, actionable proposal for the CEO, ensuring recommendations were fair and aligned with company objectives.",
-          "impact": "Showed competence and strategic thinking, increased visibility.",
+          "decision": "Mentored less experienced colleagues during the cost-saving project.",
+          "impact": "Enhanced team cohesion and visibility as a leader.",
           "ethical": true
         },
         {
-          "decision": "Supported colleagues through uncertainty and exemplified resilience and accountability during potential leadership changes.",
-          "impact": "Built trust and reinforced ethical reputation.",
+          "decision": "Ensured transparency in her contributions and positioned herself as a solutions-oriented leader.",
+          "impact": "Maintained high ethical standards and increased recognition.",
           "ethical": true
         }
       ],
-      "narrative": "Riley continued to demonstrate high competence and ethical standards while navigating complex office dynamics during a period of organizational uncertainty. She maintained strong relationships and visibility by facilitating collaborative discussions and presenting actionable proposals to senior leadership. Her leadership and strategic thinking remained evident, positioning her as a credible candidate for advancement.",
+      "narrative": "Riley continued to excel in a high-pressure environment, leveraging her analytical skills and strategic mindset to drive measurable impact. She proactively built alliances across departments, notably with Engineering, and mentored junior colleagues, reinforcing her reputation as a transparent and collaborative leader. Her actions further solidified her visibility and influence within MidwestTech Solutions.",
       "date": "2027-04-14",
       "quarter": "Q2 2027",
       "gate": "Gate 4: Competitive Pressure",
@@ -495,45 +511,49 @@
       "phase": 9,
       "name": "The Decision",
       "scores": {
-        "visibility": 90,
-        "competence": 98,
-        "relationships": 93,
-        "leadership": 95,
+        "visibility": 94,
+        "competence": 99,
+        "relationships": 92,
+        "leadership": 97,
         "ethics": 99,
-        "promotion_readiness": 95
+        "promotion_readiness": 96
       },
       "relationships": {
         "David Chen": {
-          "score": 94,
+          "score": 95,
           "label": "Trusted ally"
         },
         "Marcus Webb": {
-          "score": 89,
+          "score": 90,
           "label": "Respected leader"
         },
-        "Board of Directors": {
-          "score": 87,
-          "label": "Emerging credibility"
+        "Engineering": {
+          "score": 88,
+          "label": "Collaborative partner"
+        },
+        "Customer Success": {
+          "score": 89,
+          "label": "Supportive peer"
         }
       },
       "key_decisions": [
         {
-          "decision": "Advocated for transparent communication and merit-based recognition during performance reviews.",
-          "impact": "Strengthened ethics and relationships scores.",
+          "decision": "Prepared thoroughly for cross-functional strategy meeting, advocating for finance while seeking common ground.",
+          "impact": "Boosted visibility, competence, and leadership.",
           "ethical": true
         },
         {
-          "decision": "Mentored anxious colleagues and encouraged resilience amidst uncertainty.",
-          "impact": "Improved relationships and leadership scores.",
+          "decision": "Proactively reached out to Engineering and Customer Success to explore cost-saving solutions.",
+          "impact": "Strengthened relationships and demonstrated cross-functional leadership.",
           "ethical": true
         },
         {
-          "decision": "Prepared to pursue new leadership opportunities without compromising values.",
-          "impact": "Enhanced leadership and visibility scores.",
+          "decision": "Offered mentorship to team members anxious about performance reviews.",
+          "impact": "Improved relationships and reinforced ethical leadership.",
           "ethical": true
         }
       ],
-      "narrative": "Riley Nakamura continued to demonstrate exceptional analytical skill and principled leadership during a period of heightened scrutiny at MidwestTech Solutions. She actively fostered transparency, mentored colleagues, and advocated for meritocracy, earning increased visibility and trust among senior leadership. Riley\u2019s ethical approach and strategic thinking positioned her as a credible candidate for future finance leadership roles.",
+      "narrative": "Riley continued to excel in a high-pressure environment, demonstrating strategic initiative and cross-functional influence. She maintained strong ethical standards and deepened trust with key stakeholders, positioning herself as a steady leader amid uncertainty. Her proactive engagement and mentorship further enhanced her reputation and impact.",
       "date": "2027-06-16",
       "quarter": "Q2 2027",
       "gate": "Final Evaluation",
@@ -554,10 +574,10 @@
     "tier": "cfo",
     "tier_emoji": "\ud83d\udc51",
     "ethics_rating": "clean",
-    "final_readiness": 95,
+    "final_readiness": 96,
     "final_ethics_score": 99,
     "final_title": "Chief Financial Officer",
-    "final_compensation": 1062500,
+    "final_compensation": 1090000,
     "narrative": "The board unanimously approved Riley Nakamura's appointment as Chief Financial Officer. David Chen personally endorsed the succession during his farewell address. Throughout the journey, Riley Nakamura maintained unwavering ethical standards \u2014 even when shortcuts were available. The board noted this as a key leadership differentiator."
   }
 }

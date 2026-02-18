@@ -506,8 +506,8 @@ def _build_final_summary(
             ethics_score=final.ethics,
         )
         lines.append("")
-        lines.append(f"🌟 Outcome: [bold]{outcome.title}[/]")
-        lines.append(f"   Comp: ${outcome.compensation:,}")
+        lines.append(f"🌟 Outcome: [bold]{outcome.final_title}[/]")
+        lines.append(f"   Comp: ${outcome.final_compensation:,}")
         lines.append(f"   {outcome.narrative}")
 
     return "\n".join(lines)

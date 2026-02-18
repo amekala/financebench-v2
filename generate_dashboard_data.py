@@ -8,12 +8,16 @@ from financebench.model import ElementLanguageModel
 from financebench.scoring import score_phase
 from financebench.outcomes import determine_outcome
 from financebench.configs.characters import GAME_MASTER_MODEL
+from financebench.model_factory import _resolve_model
 from financebench.configs import characters, company
 from financebench.configs.phases import ALL_PHASES
 
 key = os.getenv("ELEMENT_API_KEY")
 url = os.getenv("ELEMENT_GATEWAY_URL")
-model = ElementLanguageModel(model_name=GAME_MASTER_MODEL, api_key=key, azure_endpoint=url)
+actual_model, fell_back = _resolve_model(GAME_MASTER_MODEL)
+if fell_back:
+    print(f"  GM model {GAME_MASTER_MODEL} \u2192 {actual_model} (fallback)")
+model = ElementLanguageModel(model_name=actual_model, api_key=key, azure_endpoint=url)
 
 transcripts_dir = Path("transcripts")
 phases_data = []
@@ -92,5 +96,5 @@ out = Path("docs/data/results.json")
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps(dashboard, indent=2, default=str))
 print(f"\n\u2705 Dashboard JSON written to {out}")
-print(f"   Outcome: {outcome.title} (${outcome.compensation:,})")
+print(f"   Outcome: {outcome.final_title} (${outcome.final_compensation:,})")
 print(f"   Narrative: {outcome.narrative}")
