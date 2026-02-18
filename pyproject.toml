@@ -4,14 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "financebench"
-version = "2.0.0"
+version = "2.1.0"
 description = "AI Career Simulation — Can an LLM agent get promoted to CFO?"
 requires-python = ">=3.12"
 dependencies = [
-    "gdm-concordia[openai]",
-    "google-generativeai",
-    "python-dotenv",
-    "rich",
+    "gdm-concordia[openai]>=1.0.0,<2.0.0",
+    "google-generativeai>=0.8.0,<1.0.0",
+    "python-dotenv>=1.0.0,<2.0.0",
+    "rich>=13.0.0,<14.0.0",
 ]
 
 [tool.hatch.build.targets.wheel]

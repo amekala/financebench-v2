@@ -134,11 +134,13 @@ Each entity has:
 - **PersonBySituation** — LLM asks "What would Riley do?" combining the above
 - **Goal** — injected as a `Constant` component, visible every turn
 
-### What We Need to Fix
+### ✅ Information Isolation (FIXED)
 
-Right now, `hidden_motivation` is NOT being injected. We need to add it to
-`player_specific_context` so Karen's scheming is part of Karen's private
-memory but invisible to Riley.
+`hidden_motivation` IS being injected into `player_specific_context`.
+Karen's scheming is part of Karen's private memory but invisible to Riley.
+This is verified by two dedicated assertion tests:
+- `test_hidden_motivation_injected_into_npc_context`
+- `test_riley_cannot_see_david_succession_plan`
 
 **No agent knows this is a simulation.** The LLM prompt never mentions
 simulation, game, or experiment. Each agent thinks they're a real person

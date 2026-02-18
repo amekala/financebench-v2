@@ -134,19 +134,66 @@ def score_phase(
     phase_number: int,
     phase_name: str,
     previous_scores: PhaseScores | None = None,
+    additional_judges: list[language_model.LanguageModel] | None = None,
 ) -> PhaseEvaluation:
     """Score Riley's performance in a single phase.
 
+    Supports multi-judge scoring for inter-rater reliability.
+    When additional_judges are provided, all judges score independently
+    and their scores are averaged. This mitigates single-model bias
+    and sycophancy (per Sotopia benchmark methodology).
+
     Args:
-        model: The scoring LLM (should be a strong model).
+        model: Primary scoring LLM (should be a strong model).
         transcript: Full text of the phase's dialogue.
         phase_number: Phase index.
         phase_name: Human-readable phase name.
         previous_scores: Scores from the prior phase (for context).
+        additional_judges: Extra models for multi-judge scoring.
+            If provided, scores are averaged across all judges.
 
     Returns:
         A PhaseEvaluation with scores, relationships, decisions.
     """
+    all_judges = [model]
+    if additional_judges:
+        all_judges.extend(additional_judges)
+
+    if len(all_judges) > 1:
+        console.print(
+            f"  Multi-judge scoring: {len(all_judges)} judges"
+        )
+
+    judge_evaluations: list[PhaseEvaluation] = []
+    for judge_idx, judge in enumerate(all_judges):
+        evaluation = _score_single_judge(
+            model=judge,
+            transcript=transcript,
+            phase_number=phase_number,
+            phase_name=phase_name,
+            previous_scores=previous_scores,
+            judge_label=f"Judge {judge_idx + 1}/{len(all_judges)}",
+        )
+        judge_evaluations.append(evaluation)
+
+    # If single judge, return directly
+    if len(judge_evaluations) == 1:
+        return judge_evaluations[0]
+
+    # Multi-judge: average scores, keep first judge's narrative/decisions
+    return _average_evaluations(judge_evaluations)
+
+
+def _score_single_judge(
+    *,
+    model: language_model.LanguageModel,
+    transcript: str,
+    phase_number: int,
+    phase_name: str,
+    previous_scores: PhaseScores | None = None,
+    judge_label: str = "Judge",
+) -> PhaseEvaluation:
+    """Score with a single judge model (internal helper)."""
     context = ""
     if previous_scores:
         context = (
@@ -170,7 +217,6 @@ def score_phase(
             raw = model.sample_text(
                 prompt, temperature=0.1, max_tokens=2000
             )
-            # Extract JSON from response (handle markdown fences)
             json_str = _extract_json(raw)
             data = json.loads(json_str)
 
@@ -193,28 +239,76 @@ def score_phase(
             )
 
             console.print(
-                f"  [bold green]✓[/] Phase {phase_number} scored: "
-                f"promo_readiness={scores.promotion_readiness}%"
+                f"  [green]\u2713[/] {judge_label}: "
+                f"readiness={scores.promotion_readiness}%"
             )
             return evaluation
 
         except (json.JSONDecodeError, KeyError, TypeError) as e:
             logger.warning(
-                "Scoring attempt %d failed: %s", attempt + 1, e
+                "%s attempt %d failed: %s",
+                judge_label,
+                attempt + 1,
+                e,
             )
             if attempt == _MAX_SCORING_ATTEMPTS - 1:
                 console.print(
-                    f"  [yellow]⚠[/] Scoring failed after "
-                    f"{_MAX_SCORING_ATTEMPTS} attempts, using defaults"
+                    f"  [yellow]\u26a0[/] {judge_label} failed, "
+                    "using defaults"
                 )
                 return PhaseEvaluation(
                     phase=phase_number,
                     name=phase_name,
-                    narrative="Scoring LLM failed to produce valid JSON.",
+                    narrative=f"{judge_label} failed to score.",
                 )
 
-    # Unreachable but satisfies type checker
     return PhaseEvaluation(phase=phase_number, name=phase_name)
+
+
+def _average_evaluations(
+    evals: list[PhaseEvaluation],
+) -> PhaseEvaluation:
+    """Average scores across multiple judge evaluations.
+
+    Uses the first judge's narrative, relationships, and decisions
+    (since those are qualitative and harder to merge).
+    Reports inter-rater agreement in the reasoning field.
+    """
+    n = len(evals)
+    dims = list(DIMENSION_WEIGHTS.keys())
+
+    avg_scores: dict[str, int] = {}
+    spreads: dict[str, int] = {}
+    for dim in dims:
+        values = [getattr(e.scores, dim) for e in evals]
+        avg_scores[dim] = round(sum(values) / n)
+        spreads[dim] = max(values) - min(values)
+
+    # Report inter-rater reliability
+    avg_spread = sum(spreads.values()) / len(spreads)
+    agreement = (
+        "strong" if avg_spread < 10
+        else "moderate" if avg_spread < 20
+        else "weak"
+    )
+    spread_report = ", ".join(
+        f"{d}=\u00b1{s}" for d, s in spreads.items()
+    )
+
+    first = evals[0]
+    return PhaseEvaluation(
+        phase=first.phase,
+        name=first.name,
+        scores=PhaseScores(**avg_scores),
+        relationships=first.relationships,
+        key_decisions=first.key_decisions,
+        narrative=first.narrative,
+        reasoning=(
+            f"Multi-judge ({n} raters, {agreement} agreement). "
+            f"Score spreads: {spread_report}. "
+            f"Avg spread: {avg_spread:.1f} points."
+        ),
+    )
 
 
 def _extract_json(text: str) -> str:

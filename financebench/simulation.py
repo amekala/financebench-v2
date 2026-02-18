@@ -27,12 +27,17 @@ def build_config(
     *,
     scene_specs: list | None = None,
     character_list: list[characters.Character] | None = None,
+    memory_summaries: dict[str, list[str]] | None = None,
 ) -> prefab_lib.Config:
     """Build a Concordia Config from our game design.
 
     Args:
         scene_specs: Concordia SceneSpecs to run. Defaults to smoke test.
         character_list: Characters to include. Defaults to all.
+        memory_summaries: Per-character memory from prior phases.
+            Dict mapping character name -> list of memory strings.
+            These are injected into player_specific_context so agents
+            remember what happened in previous phases.
 
     Returns:
         A Concordia Config ready for Simulation().
@@ -80,6 +85,10 @@ def build_config(
         # Inject hidden motivation as private memory (NPCs only)
         if char.hidden_motivation and not char.is_player:
             lines.append(char.hidden_motivation)
+        # Inject memory summaries from prior phases
+        if memory_summaries and char.name in memory_summaries:
+            lines.append("\n--- Your memories from previous events ---")
+            lines.extend(memory_summaries[char.name])
         player_context[char.name] = "\n".join(lines)
 
     instances.append(

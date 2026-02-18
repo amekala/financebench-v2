@@ -26,14 +26,6 @@ from financebench.model import ElementLanguageModel
 console = Console()
 logger = logging.getLogger(__name__)
 
-# Fallback chain: if a model isn't available, try these alternatives.
-_FALLBACKS: dict[str, list[str]] = {
-    "claude-opus-4-6": ["claude-opus-4-5", "claude-sonnet-4-5"],
-    "claude-opus-4-5": ["claude-sonnet-4-5", "gpt-4.1"],
-    "gpt-5": ["gpt-4.1", "gpt-4o"],
-    "gemini-3-pro-preview": ["gemini-2.5-pro", "gemini-2.0-flash"],
-}
-
 
 def build_model_for_character(
     char: Character,

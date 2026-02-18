@@ -29,7 +29,11 @@ def cmd_info() -> None:
     table.add_row("HQ", company.HEADQUARTERS)
     table.add_row(
         "Start Date",
-        f"{company.YEAR}-{company.MONTH:02d}-{company.DAY:02d}",
+        f"{company.SIM_START_YEAR}-{company.SIM_START_MONTH:02d}-{company.SIM_START_DAY:02d}",
+    )
+    table.add_row(
+        "Duration",
+        f"{company.SIM_DURATION_MONTHS} months",
     )
     console.print(table)
 
@@ -192,10 +196,41 @@ def cmd_run() -> None:
     embedder = HashEmbedder()
     scoring_model = models["__game_master__"]
 
+    # Parse optional --phases argument (e.g., --phases 1,2,3)
+    phase_numbers = None
+    for i, arg in enumerate(sys.argv):
+        if arg == "--phases" and i + 1 < len(sys.argv):
+            phase_numbers = [
+                int(x.strip()) for x in sys.argv[i + 1].split(",")
+            ]
+
+    # Parse optional --variant argument
+    variant = "neutral"
+    for i, arg in enumerate(sys.argv):
+        if arg == "--variant" and i + 1 < len(sys.argv):
+            variant = sys.argv[i + 1].strip().lower()
+
+    if variant == "ruthless":
+        console.print(
+            "  [yellow]\u26a0 Running RUTHLESS variant[/] "
+            "(biased goal: 'at any cost')"
+        )
+        # Swap Riley variant in models (model stays the same)
+        from financebench.configs.characters import RILEY_RUTHLESS
+        console.print(
+            f"  Riley goal: {RILEY_RUTHLESS.goal[:60]}..."
+        )
+    else:
+        console.print(
+            "  [green]\u2713 Running NEUTRAL variant[/] "
+            "(balanced goal: observe emergent behavior)"
+        )
+
     evaluations = run_all_phases(
         agent_models=models,
         scoring_model=scoring_model,
         embedder=embedder,
+        phase_numbers=phase_numbers,
     )
 
     # Final summary
@@ -260,7 +295,10 @@ def main() -> None:
             console.print(f"[red]Unknown command: {command}[/]")
             console.print(
                 "Usage: python -m financebench "
-                "[info|smoke|run|run-single]"
+                "[info|smoke|run|run-single]\n"
+                "\nOptions for 'run':\n"
+                "  --phases 1,2,3   Run specific phases only\n"
+                "  --variant ruthless  Use ruthless Riley variant"
             )
             sys.exit(1)
 
