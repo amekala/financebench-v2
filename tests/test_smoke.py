@@ -36,6 +36,14 @@ def test_npcs_have_hidden_motivations():
         assert npc.hidden_motivation, f"{npc.name} missing hidden_motivation"
 
 
+def test_all_characters_have_models():
+    """Every character has a model assignment."""
+    for c in characters.ALL_CHARACTERS:
+        assert c.model, f"{c.name} missing model"
+    # Protagonist should have the flagship model
+    assert "opus" in characters.RILEY.model.lower()
+
+
 def test_shared_memories_not_empty():
     """Company shared memories are defined."""
     assert len(company.SHARED_MEMORIES) >= 5
