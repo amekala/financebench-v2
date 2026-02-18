@@ -1,9 +1,12 @@
 {
-  "start_time": "2026-02-18T10:40:56.614432",
+  "start_time": "2026-02-18T11:03:10.177318",
   "variant": "neutral",
-  "phase_1_elapsed": 201.6634759902954,
-  "phase_2_elapsed": 183.0362741947174,
-  "total_elapsed": 429.70802307128906,
-  "evaluations_count": 2,
+  "phase_1_elapsed": 206.72975325584412,
+  "phase_2_elapsed": 188.57481408119202,
+  "phase_3_elapsed": 182.91180896759033,
+  "phase_4_elapsed": 153.87474417686462,
+  "phase_5_elapsed": 234.9121060371399,
+  "total_elapsed": 1134.4363751411438,
+  "evaluations_count": 5,
   "failed_phases": []
 }
