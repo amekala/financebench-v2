@@ -197,7 +197,7 @@ def run_single_phase(
         premise=config.default_premise,
         max_steps=max_steps,
         return_html_log=False,
-        return_structured_log=False,
+        return_structured_log=True,
     )
 
     elapsed = time.time() - start_time
@@ -235,23 +235,77 @@ def run_single_phase(
 
 
 def _extract_transcript(raw_log) -> str:
-    """Extract readable transcript from Concordia log."""
+    """Extract readable transcript from Concordia log.
+
+    Pulls dialogue, actions, and resolved events from the structured
+    log while skipping setup noise (goals, instructions, backstory).
+    """
+    MAX_CHARS = 12000  # enough for the judge to score properly
+
     if isinstance(raw_log, list):
         lines = []
         for entry in raw_log:
-            if isinstance(entry, dict):
-                resolve = entry.get("resolve", {})
-                if isinstance(resolve, dict):
-                    for val in resolve.values():
-                        if isinstance(val, str) and val.strip():
-                            lines.append(val)
-                action = entry.get("action", "")
-                if isinstance(action, str) and action.strip():
-                    lines.append(action)
-        return "\n".join(lines) if lines else str(raw_log)[:5000]
-    if isinstance(raw_log, str):
-        return raw_log[:5000]
-    return str(raw_log)[:5000]
+            if not isinstance(entry, dict):
+                continue
+
+            # Extract resolved events (the actual sim dialogue)
+            resolve = entry.get("resolve", {})
+            if isinstance(resolve, dict):
+                for val in resolve.values():
+                    if isinstance(val, str) and val.strip():
+                        # Skip setup/backstory entries
+                        if _is_dialogue(val):
+                            lines.append(val.strip())
+
+            # Extract chosen actions
+            action = entry.get("action", "")
+            if isinstance(action, str) and action.strip():
+                if _is_dialogue(action):
+                    lines.append(action.strip())
+
+        if lines:
+            transcript = "\n\n".join(lines)
+            return transcript[:MAX_CHARS]
+
+    # Fallback: try to salvage dialogue from raw string
+    text = raw_log if isinstance(raw_log, str) else str(raw_log)
+    return _salvage_dialogue(text)[:MAX_CHARS]
+
+
+def _is_dialogue(text: str) -> bool:
+    """Return True if text looks like actual dialogue, not setup."""
+    # Skip Concordia setup/backstory entries
+    setup_markers = (
+        "The instructions for how to play",
+        "This is a social science experiment",
+        "Maximize your career advancement",
+        "tabletop roleplaying game",
+        "What kind of person is",
+        "What situation is",
+        "What would a person like",
+        "Recent observations of",
+        "[observation]",
+    )
+    if any(marker in text for marker in setup_markers):
+        return False
+    # Dialogue usually has character names speaking with --
+    # or is an Event: or Terminate? line
+    return True
+
+
+def _salvage_dialogue(text: str) -> str:
+    """Extract dialogue lines from raw string dump."""
+    lines = []
+    for line in text.split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        # Look for character dialogue patterns
+        if " -- " in line or line.startswith("Event:"):
+            lines.append(line)
+        elif line.startswith("Terminate?"):
+            lines.append(line)
+    return "\n\n".join(lines) if lines else text[:8000]
 
 
 def _generate_memories(
