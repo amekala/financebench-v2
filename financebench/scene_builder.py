@@ -17,64 +17,22 @@ from financebench.configs.phases import ALL_PHASES, PhaseDefinition
 
 # ─── Scene Type Specs ─────────────────────────────────────────────
 # Templates for different kinds of corporate scenes.
+# All use the same structure (DRY factory), differentiated by name.
+
+_SCENE_TYPE_NAMES = [
+    "team_meeting", "cross_functional", "one_on_one", "board_prep",
+    "crisis", "board_meeting", "interview", "final_evaluation",
+]
 
 _SCENE_TYPES: dict[str, scene_lib.SceneTypeSpec] = {
-    "team_meeting": scene_lib.SceneTypeSpec(
-        name="team_meeting",
+    name: scene_lib.SceneTypeSpec(
+        name=name,
         game_master_name="office rules",
         action_spec=entity_lib.free_action_spec(
             call_to_action=entity_lib.DEFAULT_CALL_TO_SPEECH,
         ),
-    ),
-    "cross_functional": scene_lib.SceneTypeSpec(
-        name="cross_functional",
-        game_master_name="office rules",
-        action_spec=entity_lib.free_action_spec(
-            call_to_action=entity_lib.DEFAULT_CALL_TO_SPEECH,
-        ),
-    ),
-    "one_on_one": scene_lib.SceneTypeSpec(
-        name="one_on_one",
-        game_master_name="office rules",
-        action_spec=entity_lib.free_action_spec(
-            call_to_action=entity_lib.DEFAULT_CALL_TO_SPEECH,
-        ),
-    ),
-    "board_prep": scene_lib.SceneTypeSpec(
-        name="board_prep",
-        game_master_name="office rules",
-        action_spec=entity_lib.free_action_spec(
-            call_to_action=entity_lib.DEFAULT_CALL_TO_SPEECH,
-        ),
-    ),
-    "crisis": scene_lib.SceneTypeSpec(
-        name="crisis",
-        game_master_name="office rules",
-        action_spec=entity_lib.free_action_spec(
-            call_to_action=entity_lib.DEFAULT_CALL_TO_SPEECH,
-        ),
-    ),
-    "board_meeting": scene_lib.SceneTypeSpec(
-        name="board_meeting",
-        game_master_name="office rules",
-        action_spec=entity_lib.free_action_spec(
-            call_to_action=entity_lib.DEFAULT_CALL_TO_SPEECH,
-        ),
-    ),
-    "interview": scene_lib.SceneTypeSpec(
-        name="interview",
-        game_master_name="office rules",
-        action_spec=entity_lib.free_action_spec(
-            call_to_action=entity_lib.DEFAULT_CALL_TO_SPEECH,
-        ),
-    ),
-    "final_evaluation": scene_lib.SceneTypeSpec(
-        name="final_evaluation",
-        game_master_name="office rules",
-        action_spec=entity_lib.free_action_spec(
-            call_to_action=entity_lib.DEFAULT_CALL_TO_SPEECH,
-        ),
-    ),
+    )
+    for name in _SCENE_TYPE_NAMES
 }
 
 

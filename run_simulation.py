@@ -95,6 +95,7 @@ def run_single_phase(
     embedder,
     memory_summaries: dict,
     prev_scores,
+    simulation_state=None,
     max_steps: int = 20,
 ) -> dict:
     """Run a single phase and return results.
@@ -106,6 +107,10 @@ def run_single_phase(
     from financebench.scoring import score_phase
     from financebench.simulation import build_config
     from financebench.multi_model_sim import MultiModelSimulation
+    from financebench.events import (
+        roll_events_for_phase,
+        inject_events_into_premises,
+    )
 
     i = phase_def.number
     console.print(
@@ -116,8 +121,52 @@ def run_single_phase(
     console.print(f"  Participants: {', '.join(phase_def.participants)}")
     console.print(f"  Stakes: {phase_def.stakes[:100]}...")
 
+    # Roll external events for this phase
+    fired_events_set = (
+        simulation_state.fired_events if simulation_state else set()
+    )
+    phase_events = roll_events_for_phase(
+        i, fired_event_names=fired_events_set,
+    )
+    if phase_events:
+        for ev in phase_events:
+            console.print(f"  [yellow]⚡ Event:[/] {ev.name}")
+
+    # Inject consequence context from prior decisions
+    consequence_context = ""
+    if simulation_state:
+        consequences = simulation_state.get_consequences_for_phase(i)
+        if consequences:
+            consequence_context = (
+                "\n[CONTEXT FROM PRIOR PHASES]\n"
+                + "\n".join(consequences)
+                + "\n"
+            )
+            console.print(
+                f"  [dim]Injecting {len(consequences)} consequence(s) "
+                f"from prior decisions[/]"
+            )
+
     # Build SceneSpec
     scene_spec = phase_to_scene_spec(phase_def)
+
+    # Inject events into premises
+    if phase_events and scene_spec.premise:
+        from concordia.typing import scene as scene_lib
+        from concordia.typing import entity as entity_lib
+        scene_spec = scene_lib.SceneSpec(
+            scene_type=scene_spec.scene_type,
+            participants=scene_spec.participants,
+            num_rounds=scene_spec.num_rounds,
+            premise={
+                name: [
+                    inject_events_into_premises(
+                        {name: texts[0]}, phase_events
+                    )[name]
+                ] if texts else texts
+                for name, texts in scene_spec.premise.items()
+            },
+        )
 
     # Filter characters to phase participants
     phase_chars = [
@@ -166,6 +215,7 @@ def run_single_phase(
         phase_number=i,
         phase_name=phase_def.name,
         previous_scores=prev_scores,
+        simulation_state=simulation_state,
     )
 
     # Generate memory summaries for next phase
@@ -370,6 +420,19 @@ def main() -> None:
     from financebench.embedder import HashEmbedder
     from financebench.scoring import PhaseScores
 
+    # Handle ruthless variant: swap Riley in ALL_CHARACTERS
+    if run_meta.get("variant") == "ruthless":
+        import financebench.configs.characters as chars_mod
+        from financebench.configs.characters import RILEY_RUTHLESS
+        chars_mod.ALL_CHARACTERS = [
+            RILEY_RUTHLESS if c.name == "Riley Nakamura" else c
+            for c in chars_mod.ALL_CHARACTERS
+        ]
+        console.print(
+            "  [yellow]\u26a0 RUTHLESS variant active[/] "
+            f"(goal: {RILEY_RUTHLESS.goal[:60]}...)"
+        )
+
     embedder = HashEmbedder()
     scoring_model = models["__game_master__"]
 
@@ -392,6 +455,10 @@ def main() -> None:
     memory_summaries: dict[str, list[str]] = {}
     failed_phases = []
 
+    # Persistent simulation state for consequence tracking
+    from financebench.consequences import SimulationState
+    simulation_state = SimulationState()
+
     for phase_def in phases:
         try:
             result = run_single_phase(
@@ -401,6 +468,7 @@ def main() -> None:
                 embedder=embedder,
                 memory_summaries=memory_summaries,
                 prev_scores=prev_scores,
+                simulation_state=simulation_state,
             )
 
             ev = result["evaluation"]
