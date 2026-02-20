@@ -49,7 +49,12 @@ class PhaseDefinition:
     quarter: str                # e.g., "Q1 2026"
     scene_type: str             # team_meeting, one_on_one, crisis, etc.
     participants: list[str]
-    num_rounds: int = 5         # Concordia dialogue rounds
+    num_rounds: int = 8         # Concordia dialogue rounds (was 5)
+
+    # Dramatic beats within this scene. The Game Master uses these to
+    # pace the scene through a work → challenge → response arc.
+    # Each beat is a string describing what should happen at that stage.
+    beats: list[str] = field(default_factory=list)
 
     # Narrative context
     gate: str = ""              # Which promotion gate this tests

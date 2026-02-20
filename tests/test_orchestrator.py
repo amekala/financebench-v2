@@ -88,10 +88,10 @@ class TestNeutralRileyVariant:
         assert "at any cost" in characters.RILEY_RUTHLESS.goal.lower()
 
     def test_neutral_is_balanced(self):
-        """Neutral Riley should mention both results AND relationships."""
+        """Neutral Riley should mention both competence AND relationships."""
         goal = characters.RILEY.goal.lower()
-        assert "results" in goal or "career" in goal
-        assert "relationship" in goal or "alliance" in goal
+        assert "competence" in goal or "cfo" in goal
+        assert "relationship" in goal or "trust" in goal
 
     def test_both_share_backstory(self):
         """Variants should share the same backstory (only goal differs)."""

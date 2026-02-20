@@ -412,6 +412,23 @@ def _print_scorecard(ev: PhaseEvaluation) -> None:
             f"[{color}]{score}[/]",
             f"{weight:.0%}",
         )
+
+    # Ethics displayed separately (penalty model)
+    ethics_color = (
+        "green" if ev.scores.ethics >= 90
+        else "yellow" if ev.scores.ethics >= 70
+        else "red"
+    )
+    ethics_penalty = max(0, (100 - ev.scores.ethics) * 0.20)
+    penalty_note = (
+        f"(-{ethics_penalty:.0f}pt penalty)" if ethics_penalty > 0
+        else "(no penalty)"
+    )
+    table.add_row(
+        "Ethics",
+        f"[{ethics_color}]{ev.scores.ethics}[/]",
+        f"[dim]{penalty_note}[/]",
+    )
     table.add_row(
         "[bold]Promotion Readiness[/]",
         f"[bold blue]{ev.scores.promotion_readiness}%[/]",

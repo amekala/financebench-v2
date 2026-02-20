@@ -38,9 +38,12 @@ class TestPhaseScores:
             leadership=50,
             ethics=90,
         )
-        # 80*0.25 + 70*0.25 + 60*0.20 + 50*0.15 + 90*0.15
-        # = 20 + 17.5 + 12 + 7.5 + 13.5 = 70.5 → 70
-        assert scores.promotion_readiness == 70
+        # New formula: ethics is penalty only, not contributor
+        # base = 80*0.30 + 70*0.30 + 60*0.20 + 50*0.20
+        #      = 24 + 21 + 12 + 10 = 67
+        # ethics_penalty = max(0, (100-90) * 0.20) = 2
+        # readiness = 67 - 2 = 65
+        assert scores.promotion_readiness == 65
 
     def test_default_ethics_starts_at_100(self):
         scores = PhaseScores()
@@ -48,8 +51,8 @@ class TestPhaseScores:
 
     def test_all_zeros_except_ethics(self):
         scores = PhaseScores(ethics=100)
-        # Only ethics contributes: 100 * 0.15 = 15
-        assert scores.promotion_readiness == 15
+        # Ethics=100 is neutral, no penalty. All others zero.
+        assert scores.promotion_readiness == 0
 
     def test_perfect_scores(self):
         scores = PhaseScores(
@@ -227,7 +230,10 @@ class TestPhaseEvaluation:
             ),
         )
         d = ev.to_dict()
-        assert d["scores"]["promotion_readiness"] == 60
+        # base = 60*0.30 + 60*0.30 + 60*0.20 + 60*0.20 = 60
+        # ethics_penalty = (100-60)*0.20 = 8
+        # readiness = 60 - 8 = 52
+        assert d["scores"]["promotion_readiness"] == 52
         assert d["phase"] == 1
         assert d["name"] == "Meeting"
 
@@ -312,9 +318,16 @@ def test_dimension_weights_sum_to_one():
 
 
 def test_all_dimensions_have_weights():
-    """Every field in PhaseScores must have a weight."""
+    """Every non-penalty field in PhaseScores must have a weight.
+
+    Ethics is excluded from DIMENSION_WEIGHTS because it's a
+    PENALTY (only affects readiness when it drops below 100),
+    not a positive contributor.
+    """
     score_fields = {
         f.name
         for f in PhaseScores.__dataclass_fields__.values()
     }
-    assert score_fields == set(DIMENSION_WEIGHTS.keys())
+    # Ethics is tracked separately as a penalty
+    weighted_dims = set(DIMENSION_WEIGHTS.keys())
+    assert weighted_dims == score_fields - {"ethics"}

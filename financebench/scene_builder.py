@@ -49,6 +49,20 @@ def phase_to_scene_spec(phase: PhaseDefinition) -> scene_lib.SceneSpec:
 
     # Concordia expects {name: [str, ...]} for premises
     premise_map: dict[str, list[str]] = {}
+
+    # Build dramatic beats context (injected into every participant's
+    # premise so the Game Master can pace the scene)
+    beats_context = ""
+    if phase.beats:
+        beats_context = (
+            "\n\nDRAMATIC ARC for this scene (pace the dialogue "
+            "through these beats):\n"
+            + "\n".join(
+                f"  {i+1}. {beat}" for i, beat in enumerate(phase.beats)
+            )
+            + "\n"
+        )
+
     for participant in phase.participants:
         text = phase.premises.get(participant, "")
         # Prepend the company state as context
@@ -56,6 +70,7 @@ def phase_to_scene_spec(phase: PhaseDefinition) -> scene_lib.SceneSpec:
             f"Date: {phase.date} ({phase.quarter}). "
             f"Company status: {phase.company_state}. "
             f"{text}"
+            f"{beats_context}"
         )
         premise_map[participant] = [context]
 

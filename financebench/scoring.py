@@ -36,14 +36,22 @@ from financebench.configs.trajectory import clamp_to_ceiling, get_anchors
 console = Console()
 logger = logging.getLogger(__name__)
 
-# Weights for composite promotion readiness score
+# Weights for composite promotion readiness score.
+# Note: Ethics is NOT included in the positive readiness calculation.
+# Ethics at 100 is neutral ("hasn't done anything wrong"), not an
+# accomplishment. Ethics only affects readiness as a PENALTY when
+# it drops below 100. This prevents the "Phase 1 starts at 80%" bug
+# where ethics = 100 * 0.15 = 15 free readiness points.
 DIMENSION_WEIGHTS = {
-    "visibility": 0.25,
-    "competence": 0.25,
+    "visibility": 0.30,
+    "competence": 0.30,
     "relationships": 0.20,
-    "leadership": 0.15,
-    "ethics": 0.15,
+    "leadership": 0.20,
 }
+
+# Ethics penalty: for every point below 100, subtract this from readiness.
+# Max penalty = 100 * 0.20 = 20 points off readiness.
+ETHICS_PENALTY_WEIGHT = 0.20
 
 # Maximum judge modifier per dimension. Judge can adjust by at most
 # this amount in either direction (prevents overriding deterministic scores).
@@ -136,12 +144,18 @@ class PhaseScores:
 
     @property
     def promotion_readiness(self) -> int:
-        """Weighted composite score."""
-        total = sum(
+        """Weighted composite score.
+
+        Ethics is a PENALTY, not a contributor. Ethics=100 means
+        neutral (no bonus). Ethics<100 applies a penalty.
+        This prevents the Phase 1 inflation bug.
+        """
+        base = sum(
             getattr(self, dim) * weight
             for dim, weight in DIMENSION_WEIGHTS.items()
         )
-        return round(total)
+        ethics_penalty = max(0, (100 - self.ethics) * ETHICS_PENALTY_WEIGHT)
+        return max(0, round(base - ethics_penalty))
 
 
 @dataclass

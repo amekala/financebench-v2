@@ -10,3 +10,5 @@ results/
 *.csv
 .DS_Store
 simulation*.log
+checkpoints/
+last_run.json

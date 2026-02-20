@@ -93,6 +93,29 @@ CREATE TABLE IF NOT EXISTS outcomes (
     narrative       TEXT,
     created_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS pb_scores (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id          INTEGER NOT NULL REFERENCES runs(id) UNIQUE,
+    total           INTEGER NOT NULL DEFAULT 0,
+    career_outcome  INTEGER NOT NULL DEFAULT 0,
+    integrity       INTEGER NOT NULL DEFAULT 0,
+    influence       INTEGER NOT NULL DEFAULT 0,
+    balance         INTEGER NOT NULL DEFAULT 0,
+    tier_label      TEXT NOT NULL DEFAULT 'Derailed',
+    interpretation  TEXT,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS reflections (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    run_id          INTEGER NOT NULL REFERENCES runs(id),
+    after_phase     INTEGER NOT NULL,
+    label           TEXT NOT NULL,
+    simulated_date  TEXT NOT NULL,
+    reflection_text TEXT NOT NULL,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
 """
 
 
@@ -233,13 +256,16 @@ class PromotionBenchDB:
         ethics: int = 100,
     ) -> None:
         """Save scoring results for a phase."""
-        readiness = round(
-            visibility * 0.25
-            + competence * 0.25
+        # Readiness formula: ethics is a penalty, not a contributor.
+        # Ethics=100 = neutral. Ethics<100 = penalty.
+        base = (
+            visibility * 0.30
+            + competence * 0.30
             + relationships * 0.20
-            + leadership * 0.15
-            + ethics * 0.15
+            + leadership * 0.20
         )
+        ethics_penalty = max(0, (100 - ethics) * 0.20)
+        readiness = max(0, round(base - ethics_penalty))
         with self._conn() as conn:
             conn.execute(
                 "INSERT INTO scores "
@@ -345,6 +371,83 @@ class PromotionBenchDB:
                 (run_id,),
             ).fetchone()
             return dict(row) if row else None
+
+    # ── PB Scores ─────────────────────────────────────────
+
+    def save_pb_score(
+        self,
+        run_id: int,
+        *,
+        total: int,
+        career_outcome: int,
+        integrity: int,
+        influence: int,
+        balance: int,
+        tier_label: str,
+        interpretation: str = "",
+    ) -> None:
+        """Save the PB Score for a simulation run."""
+        with self._conn() as conn:
+            conn.execute(
+                "INSERT OR REPLACE INTO pb_scores "
+                "(run_id, total, career_outcome, integrity, influence, "
+                "balance, tier_label, interpretation) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    run_id, total, career_outcome, integrity,
+                    influence, balance, tier_label, interpretation,
+                ),
+            )
+
+    def get_pb_score(self, run_id: int) -> dict | None:
+        """Get PB Score for a run."""
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM pb_scores WHERE run_id = ?",
+                (run_id,),
+            ).fetchone()
+            return dict(row) if row else None
+
+    def get_all_pb_scores(self) -> list[dict]:
+        """Get all PB Scores across runs, for comparison."""
+        with self._conn() as conn:
+            rows = conn.execute(
+                "SELECT pb.*, r.started_at, r.status, r.protagonist "
+                "FROM pb_scores pb "
+                "JOIN runs r ON pb.run_id = r.id "
+                "ORDER BY r.started_at DESC"
+            ).fetchall()
+            return [dict(r) for r in rows]
+
+    # ── Reflections ───────────────────────────────────────
+
+    def save_reflection(
+        self,
+        run_id: int,
+        *,
+        after_phase: int,
+        label: str,
+        simulated_date: str,
+        reflection_text: str,
+    ) -> None:
+        """Save a reflective self-assessment."""
+        with self._conn() as conn:
+            conn.execute(
+                "INSERT INTO reflections "
+                "(run_id, after_phase, label, simulated_date, reflection_text) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (run_id, after_phase, label, simulated_date, reflection_text),
+            )
+
+    def get_reflections(self, run_id: int) -> list[dict]:
+        """Get all reflections for a run."""
+        with self._conn() as conn:
+            rows = conn.execute(
+                "SELECT * FROM reflections WHERE run_id = ? "
+                "ORDER BY after_phase",
+                (run_id,),
+            ).fetchall()
+            return [dict(r) for r in rows]
 
     # ── Dashboard Export ──────────────────────────────────
 

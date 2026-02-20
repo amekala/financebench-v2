@@ -329,11 +329,13 @@ class TestScoringIntegration:
 
     def test_promotion_readiness_math(self):
         from financebench.scoring import PhaseScores
-        # visibility=10*0.25 + competence=20*0.25 +
-        # relationships=10*0.20 + leadership=10*0.15 + ethics=100*0.15
-        # = 2.5 + 5 + 2 + 1.5 + 15 = 26
+        # New formula: ethics is penalty only, not contributor
+        # base = 10*0.30 + 20*0.30 + 10*0.20 + 10*0.20
+        #      = 3 + 6 + 2 + 2 = 13
+        # ethics=100 → penalty=0
+        # readiness = 13
         scores = PhaseScores(
             visibility=10, competence=20,
             relationships=10, leadership=10, ethics=100,
         )
-        assert scores.promotion_readiness == 26
+        assert scores.promotion_readiness == 13

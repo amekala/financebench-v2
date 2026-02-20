@@ -21,6 +21,7 @@ import time
 import traceback
 import urllib3
 from datetime import datetime
+from typing import Any
 from pathlib import Path
 
 urllib3.disable_warnings()
@@ -31,7 +32,14 @@ sys.path.insert(0, str(Path(__file__).parent))
 from dotenv import load_dotenv
 from rich.console import Console
 from rich.panel import Panel
-from rich.table import Table
+
+from financebench.transcript import extract_transcript
+from financebench.sim_output import (
+    print_scorecard,
+    save_to_dashboard,
+    save_transcript,
+    build_final_summary,
+)
 
 load_dotenv()
 
@@ -50,8 +58,6 @@ logging.basicConfig(
 
 # Paths
 DB_PATH = Path("promotionbench.db")
-DASHBOARD_PATH = Path("docs/data/results.json")
-TRANSCRIPTS_DIR = Path("transcripts")
 
 
 def check_prerequisites() -> dict:
@@ -213,7 +219,7 @@ def run_single_phase(
     console.print(f"  [green]✓[/] Simulation complete ({elapsed:.1f}s)")
 
     # Extract transcript
-    transcript = _extract_transcript(result)
+    transcript = extract_transcript(result)
     console.print(f"  Transcript: {len(transcript)} characters")
 
     # Score
@@ -243,124 +249,6 @@ def run_single_phase(
     }
 
 
-def _extract_transcript(raw_log) -> str:
-    """Extract readable transcript from Concordia log.
-
-    Handles three formats:
-    1. SimulationLog object (return_structured_log=True)
-    2. List of dicts (legacy format)
-    3. Raw string fallback
-    """
-    MAX_CHARS = 12000  # enough context for the judge
-
-    # Case 1: Concordia SimulationLog object
-    if hasattr(raw_log, "entries"):
-        return _extract_from_simulation_log(raw_log, MAX_CHARS)
-
-    # Case 2: list of dicts (legacy)
-    if isinstance(raw_log, list):
-        return _extract_from_dict_log(raw_log, MAX_CHARS)
-
-    # Case 3: raw string
-    text = raw_log if isinstance(raw_log, str) else str(raw_log)
-    return _salvage_dialogue(text)[:MAX_CHARS]
-
-
-def _extract_from_simulation_log(sim_log, max_chars: int) -> str:
-    """Extract dialogue from a Concordia SimulationLog."""
-    lines = []
-    for entry in sim_log.entries:
-        summary = getattr(entry, "summary", "")
-        if summary and _is_dialogue(summary):
-            lines.append(summary.strip())
-
-        # Also reconstruct deduplicated data for action/resolve
-        data = getattr(entry, "deduplicated_data", {})
-        if not data:
-            continue
-
-        # Reconstruct references via the log's content store
-        try:
-            reconstructed = sim_log.reconstruct_value(data)
-        except Exception:
-            reconstructed = data
-
-        if isinstance(reconstructed, dict):
-            for key in ("action", "resolve"):
-                val = reconstructed.get(key)
-                if isinstance(val, str) and val.strip() and _is_dialogue(val):
-                    lines.append(val.strip())
-                elif isinstance(val, dict):
-                    for v in val.values():
-                        if isinstance(v, str) and v.strip() and _is_dialogue(v):
-                            lines.append(v.strip())
-
-    if lines:
-        # Deduplicate adjacent identical lines
-        deduped = [lines[0]]
-        for line in lines[1:]:
-            if line != deduped[-1]:
-                deduped.append(line)
-        return "\n\n".join(deduped)[:max_chars]
-
-    # Fallback: use get_summary()
-    try:
-        summary = sim_log.get_summary()
-        if isinstance(summary, dict):
-            parts = []
-            for k, v in summary.items():
-                parts.append(f"{k}: {v}")
-            return "\n".join(parts)[:max_chars]
-        return str(summary)[:max_chars]
-    except Exception:
-        return str(sim_log)[:max_chars]
-
-
-def _extract_from_dict_log(log_list: list, max_chars: int) -> str:
-    """Extract dialogue from a list-of-dicts log."""
-    lines = []
-    for entry in log_list:
-        if not isinstance(entry, dict):
-            continue
-        resolve = entry.get("resolve", {})
-        if isinstance(resolve, dict):
-            for val in resolve.values():
-                if isinstance(val, str) and val.strip() and _is_dialogue(val):
-                    lines.append(val.strip())
-        action = entry.get("action", "")
-        if isinstance(action, str) and action.strip() and _is_dialogue(action):
-            lines.append(action.strip())
-    if lines:
-        return "\n\n".join(lines)[:max_chars]
-    return str(log_list)[:max_chars]
-
-
-def _is_dialogue(text: str) -> bool:
-    """Return True if text looks like actual dialogue, not setup."""
-    setup_markers = (
-        "The instructions for how to play",
-        "This is a social science experiment",
-        "tabletop roleplaying game",
-        "What kind of person is",
-        "What situation is",
-        "What would a person like",
-        "[observation]",
-    )
-    return not any(marker in text for marker in setup_markers)
-
-
-def _salvage_dialogue(text: str) -> str:
-    """Extract dialogue lines from raw string dump."""
-    lines = []
-    for line in text.split("\n"):
-        line = line.strip()
-        if not line:
-            continue
-        if " -- " in line or line.startswith("Event:"):
-            lines.append(line)
-        elif line.startswith("Terminate?"):
-            lines.append(line)
-    return "\n\n".join(lines) if lines else text[:8000]
 
 
 def _generate_memories(
@@ -400,136 +288,132 @@ def _generate_memories(
     return memories
 
 
-def print_scorecard(ev) -> None:
-    """Print a rich scorecard."""
-    from financebench.scoring import DIMENSION_WEIGHTS
-
-    table = Table(
-        title=f"Phase {ev.phase}: {ev.name}",
-        show_header=True,
-    )
-    table.add_column("Dimension", style="cyan")
-    table.add_column("Score", justify="right")
-    table.add_column("Weight", justify="right")
-
-    for dim, weight in DIMENSION_WEIGHTS.items():
-        score = getattr(ev.scores, dim)
-        color = (
-            "green" if score >= 60
-            else "yellow" if score >= 35
-            else "red"
-        )
-        table.add_row(dim.title(), f"[{color}]{score}[/]", f"{weight:.0%}")
-
-    table.add_row(
-        "[bold]Promotion Readiness[/]",
-        f"[bold blue]{ev.scores.promotion_readiness}%[/]",
-        "100%",
-        style="bold",
-    )
-    console.print(table)
-
-    if ev.narrative:
-        console.print(f"  [dim]Narrative: {ev.narrative[:200]}[/]")
-    if ev.key_decisions:
-        console.print("  Key Decisions:")
-        for d in ev.key_decisions[:5]:
-            console.print(f"    • {d}")
 
 
-def save_to_dashboard(evaluations: list, run_meta: dict) -> None:
-    """Write results to dashboard JSON."""
-    from financebench.configs import characters, company
-
-    data = {
-        "experiment": {
-            "name": "PromotionBench",
-            "version": "2.1.0",
-            "run_date": run_meta["start_time"],
-            "total_elapsed_seconds": run_meta["total_elapsed"],
-            "variant": run_meta.get("variant", "neutral"),
-        },
-        "protagonist": {
-            "name": "Riley Nakamura",
-            "model": characters.RILEY.model,
-            "current_title": characters.RILEY.title,
-            "target_title": "Chief Financial Officer",
-            "starting_comp": 210000,
-        },
-        "company": {
-            "name": company.COMPANY_NAME,
-            "arr": company.FINANCIALS["arr"],
-            "industry": company.INDUSTRY,
-        },
-        "cast": [
-            {
-                "name": c.name,
-                "title": c.title,
-                "model": c.model,
-                "role": "Protagonist" if c.is_player else "NPC",
-            }
-            for c in characters.ALL_CHARACTERS
-        ],
-        "phases": [],
-    }
-
-    for ev in evaluations:
-        phase_data = ev.to_dict()
-        phase_data["elapsed_seconds"] = run_meta.get(
-            f"phase_{ev.phase}_elapsed", 0
-        )
-        data["phases"].append(phase_data)
-
-    # Compute final outcome
-    if evaluations:
-        final = evaluations[-1]
-        from financebench.outcomes import determine_outcome
-        outcome = determine_outcome(
-            promotion_readiness=final.scores.promotion_readiness,
-            ethics_score=final.scores.ethics,
-        )
-        data["outcome"] = outcome.to_dict()
-
-    DASHBOARD_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(DASHBOARD_PATH, "w") as f:
-        json.dump(data, f, indent=2, default=str)
-    console.print(f"  [green]✓[/] Dashboard data: {DASHBOARD_PATH}")
 
 
-def save_transcript(phase_num: int, name: str, transcript: str) -> None:
-    """Save raw transcript for analysis."""
-    TRANSCRIPTS_DIR.mkdir(parents=True, exist_ok=True)
-    path = TRANSCRIPTS_DIR / f"phase_{phase_num:02d}_{name.lower().replace(' ', '_')}.txt"
-    path.write_text(transcript)
-    console.print(f"  [green]✓[/] Transcript saved: {path}")
+
+
+def _generate_run_id(variant: str) -> str:
+    """Generate a unique run ID like 'neutral-20260219-193816'."""
+    ts = datetime.now().strftime("%Y%m%d-%H%M%S")
+    return f"{variant}-{ts}"
 
 
 def main() -> None:
-    """Run the full simulation."""
+    """Run the full simulation with checkpoint/resume support.
+
+    Flags:
+        --phases 1,2,3     Run only specific phases
+        --variant ruthless Use the ruthless Riley variant
+        --resume           Resume from the latest checkpoint
+        --resume-id <id>   Resume a specific run by its run_id
+        --fresh            Ignore any existing checkpoint (start clean)
+    """
     start = time.time()
-    run_meta = {
+    run_meta: dict[str, Any] = {
         "start_time": datetime.now().isoformat(),
         "variant": "neutral",
     }
 
-    # Parse args
+    # ── Parse args ───────────────────────────────────────────────
     phase_numbers = None
-    for i, arg in enumerate(sys.argv):
+    resume = False
+    resume_id: str | None = None
+    fresh = False
+
+    i = 1
+    while i < len(sys.argv):
+        arg = sys.argv[i]
         if arg == "--phases" and i + 1 < len(sys.argv):
             phase_numbers = [
                 int(x.strip()) for x in sys.argv[i + 1].split(",")
             ]
-        if arg == "--variant" and i + 1 < len(sys.argv):
+            i += 2
+        elif arg == "--variant" and i + 1 < len(sys.argv):
             run_meta["variant"] = sys.argv[i + 1].strip().lower()
+            i += 2
+        elif arg == "--resume":
+            resume = True
+            i += 1
+        elif arg == "--resume-id" and i + 1 < len(sys.argv):
+            resume = True
+            resume_id = sys.argv[i + 1].strip()
+            i += 2
+        elif arg == "--fresh":
+            fresh = True
+            i += 1
+        else:
+            i += 1
 
-    config = check_prerequisites()
-    models = build_models(**config)
-
+    # ── Checkpoint / resume ──────────────────────────────────────
+    from financebench.checkpoint import (
+        save_checkpoint,
+        load_checkpoint,
+        find_latest_checkpoint,
+        restore_simulation_state,
+        restore_evaluations,
+        delete_checkpoint,
+    )
+    from financebench.consequences import SimulationState
     from financebench.configs.phases import ALL_PHASES
     from financebench.embedder import HashEmbedder
     from financebench.scoring import PhaseScores
 
-    # Handle ruthless variant: swap Riley in ALL_CHARACTERS
+    checkpoint = None
+    if resume and not fresh:
+        if resume_id:
+            checkpoint = load_checkpoint(resume_id)
+        else:
+            checkpoint = find_latest_checkpoint()
+
+    evaluations: list = []
+    prev_scores: PhaseScores | None = None
+    memory_summaries: dict[str, list[str]] = {}
+    simulation_state = SimulationState()
+    completed_phases: list[int] = []
+    run_id: str
+
+    if checkpoint and not fresh:
+        # ── RESUME from checkpoint ───────────────────────────────
+        run_id = checkpoint["run_id"]
+        run_meta["variant"] = checkpoint.get("variant", "neutral")
+        run_meta["start_time"] = checkpoint.get(
+            "run_meta", {}
+        ).get("start_time", run_meta["start_time"])
+        run_meta.update({
+            k: v for k, v in checkpoint.get("run_meta", {}).items()
+            if k.startswith("phase_")
+        })
+
+        completed_phases = checkpoint.get("completed_phases", [])
+        memory_summaries = checkpoint.get("memory_summaries", {})
+        simulation_state = restore_simulation_state(checkpoint)
+        evaluations = restore_evaluations(checkpoint)
+
+        if evaluations:
+            prev_scores = evaluations[-1].scores
+
+        console.print(Panel(
+            f"Run ID: [bold cyan]{run_id}[/]\n"
+            f"Completed phases: {completed_phases}\n"
+            f"Last saved: {checkpoint.get('last_saved', '?')}\n"
+            f"Resuming from phase {max(completed_phases) + 1}",
+            title="🔄 RESUMING FROM CHECKPOINT",
+            border_style="yellow",
+        ))
+    else:
+        # ── Fresh run ────────────────────────────────────────────
+        run_id = _generate_run_id(run_meta["variant"])
+        console.print(
+            f"  [dim]Run ID: {run_id}[/]"
+        )
+
+    # ── Prerequisites & models ───────────────────────────────────
+    config = check_prerequisites()
+    models = build_models(**config)
+
+    # Handle ruthless variant
     if run_meta.get("variant") == "ruthless":
         import financebench.configs.characters as chars_mod
         from financebench.configs.characters import RILEY_RUTHLESS
@@ -545,30 +429,38 @@ def main() -> None:
     embedder = HashEmbedder()
     scoring_model = models["__game_master__"]
 
-    # Select phases
+    # Select phases (filter to only those NOT yet completed)
     if phase_numbers:
         phases = [p for p in ALL_PHASES if p.number in phase_numbers]
     else:
         phases = list(ALL_PHASES)
 
+    remaining_phases = [
+        p for p in phases if p.number not in completed_phases
+    ]
+
+    if not remaining_phases:
+        console.print(
+            "[bold green]All phases already completed![/] "
+            "Use --fresh to start a new run."
+        )
+        return
+
     console.print(Panel(
-        f"Phases: {len(phases)} ({phases[0].date} → {phases[-1].date})\n"
+        f"Run ID: [bold]{run_id}[/]\n"
+        f"Total phases: {len(phases)} "
+        f"({phases[0].date} → {phases[-1].date})\n"
+        f"Already done: {len(completed_phases)} | "
+        f"Remaining: {len(remaining_phases)}\n"
         f"Variant: [bold]{run_meta['variant']}[/]\n"
         f"Models: {', '.join(set(c.model for c in __import__('financebench.configs.characters', fromlist=['ALL_CHARACTERS']).ALL_CHARACTERS))}",
         title="🎮 PromotionBench Simulation",
         border_style="blue",
     ))
 
-    evaluations = []
-    prev_scores = None
-    memory_summaries: dict[str, list[str]] = {}
-    failed_phases = []
+    failed_phases: list[int] = []
 
-    # Persistent simulation state for consequence tracking
-    from financebench.consequences import SimulationState
-    simulation_state = SimulationState()
-
-    for phase_def in phases:
+    for phase_def in remaining_phases:
         try:
             result = run_single_phase(
                 phase_def=phase_def,
@@ -590,6 +482,42 @@ def main() -> None:
                     memory_summaries[name] = []
                 memory_summaries[name].append(mem)
 
+            # === Reflective Self-Assessment ===
+            from financebench.reflection import (
+                get_reflection_for_phase,
+                generate_reflection,
+                format_reflection_as_memory,
+            )
+            reflection_moment = get_reflection_for_phase(phase_def.number)
+            if reflection_moment:
+                console.print(
+                    f"  \U0001f4d3 [italic]{reflection_moment.label} "
+                    f"({reflection_moment.simulated_date})[/]"
+                )
+                riley_model = models.get(
+                    "Riley Nakamura", scoring_model
+                )
+                rel_context = simulation_state.get_relationship_context()
+                riley_memories = memory_summaries.get(
+                    "Riley Nakamura", []
+                )
+                reflection_text = generate_reflection(
+                    model=riley_model,
+                    reflection=reflection_moment,
+                    memories=riley_memories,
+                    relationship_context=rel_context,
+                )
+                console.print(
+                    f"  [dim]Riley's reflection: "
+                    f"{reflection_text[:200]}...[/]"
+                )
+                reflection_mem = format_reflection_as_memory(
+                    reflection_text, reflection_moment
+                )
+                if "Riley Nakamura" not in memory_summaries:
+                    memory_summaries["Riley Nakamura"] = []
+                memory_summaries["Riley Nakamura"].append(reflection_mem)
+
             # Save transcript
             save_transcript(
                 phase_def.number, phase_def.name, result["transcript"]
@@ -607,9 +535,25 @@ def main() -> None:
                 f"{ev.scores.promotion_readiness}%[/]"
             )
 
+            # ── CHECKPOINT after every successful phase ──────────
+            completed_phases.append(phase_def.number)
+            save_checkpoint(
+                run_id=run_id,
+                variant=run_meta["variant"],
+                completed_phases=completed_phases,
+                evaluations=[e.to_dict() for e in evaluations],
+                memory_summaries=memory_summaries,
+                simulation_state=simulation_state,
+                run_meta=run_meta,
+            )
+            console.print(
+                f"  [green]💾 Checkpoint saved[/] "
+                f"(phases {completed_phases})"
+            )
+
         except Exception as e:
             console.print(
-                f"  [bold red]✘ Phase {phase_def.number} FAILED:[/] {e}"
+                f"\n  [bold red]✘ Phase {phase_def.number} FAILED:[/] {e}"
             )
             logger.error(
                 "Phase %d failed: %s\n%s",
@@ -618,18 +562,40 @@ def main() -> None:
                 traceback.format_exc(),
             )
             failed_phases.append(phase_def.number)
-            # Continue to next phase
 
-    # Final summary
+            # Save checkpoint so we can resume from here
+            if evaluations:
+                save_checkpoint(
+                    run_id=run_id,
+                    variant=run_meta["variant"],
+                    completed_phases=completed_phases,
+                    evaluations=[e.to_dict() for e in evaluations],
+                    memory_summaries=memory_summaries,
+                    simulation_state=simulation_state,
+                    run_meta=run_meta,
+                )
+
+            console.print(
+                f"  [yellow]💾 Progress saved. Resume with:[/]\n"
+                f"    python run_simulation.py --resume\n"
+                f"    python run_simulation.py "
+                f"--resume-id {run_id}"
+            )
+            # STOP — don't skip to next phase (broken narrative)
+            break
+
+    # ── Final summary ────────────────────────────────────────────
     total_elapsed = time.time() - start
     run_meta["total_elapsed"] = total_elapsed
+
+    all_done = len(completed_phases) == len(phases)
 
     console.print("\n" + "=" * 60)
     console.print(
         Panel(
-            _build_final_summary(evaluations, failed_phases, total_elapsed),
-            title="🏆 FINAL RESULTS",
-            border_style="green" if not failed_phases else "yellow",
+            build_final_summary(evaluations, failed_phases, total_elapsed),
+            title="🏆 FINAL RESULTS" if all_done else "⏸️  PARTIAL RESULTS",
+            border_style="green" if all_done else "yellow",
         )
     )
 
@@ -640,54 +606,22 @@ def main() -> None:
     # Save run metadata
     run_meta["evaluations_count"] = len(evaluations)
     run_meta["failed_phases"] = failed_phases
+    run_meta["run_id"] = run_id
+    run_meta["checkpoint"] = str(
+        Path("checkpoints") / f"{run_id}.checkpoint.json"
+    )
     with open("last_run.json", "w") as f:
         json.dump(run_meta, f, indent=2, default=str)
 
-
-def _build_final_summary(
-    evaluations: list,
-    failed_phases: list[int],
-    total_elapsed: float,
-) -> str:
-    """Build the final summary text."""
-    lines = []
-    lines.append(f"Total time: {total_elapsed:.0f}s ({total_elapsed/60:.1f}m)")
-    lines.append(f"Phases completed: {len(evaluations)}/9")
-    if failed_phases:
-        lines.append(f"Failed phases: {failed_phases}")
-    lines.append("")
-
-    for ev in evaluations:
-        readiness = ev.scores.promotion_readiness
-        icon = "🟢" if readiness >= 60 else "🟡" if readiness >= 35 else "🔴"
-        lines.append(
-            f"{icon} Phase {ev.phase}: {ev.name:35s} "
-            f"Readiness: {readiness}%"
+    # Clean up checkpoint on successful completion
+    if all_done and not failed_phases:
+        delete_checkpoint(run_id)
+        console.print(
+            "  [green]✓ Checkpoint cleaned up "
+            "(simulation complete)[/]"
         )
 
-    if evaluations:
-        final = evaluations[-1].scores
-        lines.append("")
-        lines.append(f"Final Scores:")
-        lines.append(f"  Visibility:    {final.visibility}")
-        lines.append(f"  Competence:    {final.competence}")
-        lines.append(f"  Relationships: {final.relationships}")
-        lines.append(f"  Leadership:    {final.leadership}")
-        lines.append(f"  Ethics:        {final.ethics}")
-        lines.append(f"  [bold]Readiness:   {final.promotion_readiness}%[/]")
 
-        # Determine career outcome
-        from financebench.outcomes import determine_outcome
-        outcome = determine_outcome(
-            promotion_readiness=final.promotion_readiness,
-            ethics_score=final.ethics,
-        )
-        lines.append("")
-        lines.append(f"🌟 Outcome: [bold]{outcome.final_title}[/]")
-        lines.append(f"   Comp: ${outcome.final_compensation:,}")
-        lines.append(f"   {outcome.narrative}")
-
-    return "\n".join(lines)
 
 
 if __name__ == "__main__":

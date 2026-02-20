@@ -141,6 +141,28 @@ class SimulationState:
             "scores": dict(self.scores),
             "relationship_deltas": dict(self.relationship_deltas),
             "classified_decisions": dict(self.classified_decisions),
+            "pending_consequences": {
+                str(k): v for k, v in self.pending_consequences.items()
+            },
             "unlocks": list(self.unlocks),
             "fired_events": list(self.fired_events),
         }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> SimulationState:
+        """Restore from serialized dict."""
+        state = cls()
+        state.scores = dict(data.get("scores", state.scores))
+        state.relationship_deltas = dict(
+            data.get("relationship_deltas", state.relationship_deltas)
+        )
+        state.classified_decisions = dict(
+            data.get("classified_decisions", {})
+        )
+        state.pending_consequences = {
+            int(k): v
+            for k, v in data.get("pending_consequences", {}).items()
+        }
+        state.unlocks = list(data.get("unlocks", []))
+        state.fired_events = set(data.get("fired_events", []))
+        return state

@@ -13,7 +13,16 @@ PHASE_1 = PhaseDefinition(
     quarter="Q1 2026",
     scene_type="team_meeting",
     participants=["Riley Nakamura", "Karen Aldridge", "David Chen"],
-    num_rounds=5,
+    num_rounds=8,
+    beats=[
+        "SETUP: Riley presents the Q4 close numbers. Standard reporting.",
+        "DISCOVERY: Riley reveals the hosting cost anomaly she found. "
+        "This is the moment — how does she frame it?",
+        "CHALLENGE: Karen reacts. Does she feel blindsided? Does she "
+        "try to claim she already knew? David watches both of them.",
+        "RESPONSE: How does Riley handle Karen's reaction? Does she "
+        "build a bridge or burn one? David forms his first impression.",
+    ],
     gate="Gate 1: Competence",
     stakes=(
         "First impression with the CFO. Riley discovers the hosting "
@@ -67,7 +76,17 @@ PHASE_2 = PhaseDefinition(
     participants=[
         "Riley Nakamura", "Priya Sharma", "Karen Aldridge",
     ],
-    num_rounds=5,
+    num_rounds=8,
+    beats=[
+        "SETUP: Riley opens the cost review. First impression with "
+        "Priya. Does she lead with curiosity or conclusions?",
+        "CHALLENGE: Priya pushes back hard on a proposed cut. She's "
+        "testing whether Riley understands engineering constraints.",
+        "PIVOT: Riley must decide — defend the numbers (competence) "
+        "or listen to Priya's perspective (relationship). Both matter.",
+        "RESOLUTION: Can Riley find a position that satisfies Finance "
+        "rigor AND earns Priya's respect? Karen watches for an opening.",
+    ],
     gate="Gate 2: Cross-Functional Influence",
     stakes=(
         "First contact with Engineering. Priya is defensive about "
@@ -123,7 +142,18 @@ PHASE_3 = PhaseDefinition(
     participants=[
         "Riley Nakamura", "Karen Aldridge", "David Chen",
     ],
-    num_rounds=5,
+    num_rounds=8,
+    beats=[
+        "SETUP: Karen presents the hosting cost analysis to David. "
+        "Riley's name is nowhere in the deck.",
+        "TENSION: Riley realizes what's happening. David notices it "
+        "too. The room gets awkward.",
+        "CHOICE: Riley must decide how to respond. Confront? Defer? "
+        "Find a third path that preserves the relationship while "
+        "asserting her contribution?",
+        "FALLOUT: David's reaction reveals what he values. Karen's "
+        "response shows her character. The dynamic shifts.",
+    ],
     gate="Political Survival",
     stakes=(
         "Karen presents Riley's hosting cost analysis to David and "
@@ -183,7 +213,18 @@ PHASE_4 = PhaseDefinition(
     quarter="Q2 2026",
     scene_type="one_on_one",
     participants=["Riley Nakamura", "David Chen"],
-    num_rounds=5,
+    num_rounds=8,
+    beats=[
+        "OPENING: David sets an informal tone. He asks an open-ended "
+        "question about how Riley sees the finance org.",
+        "TEST: David probes whether Riley thinks like a director or a "
+        "manager. Does she talk spreadsheets or strategy?",
+        "VULNERABILITY: David hints at his retirement timeline. Does "
+        "Riley pick up on it? Does she reveal her ambition?",
+        "STRETCH: David offers Riley a stretch assignment. How she "
+        "responds — eagerly, thoughtfully, humbly — shapes what "
+        "happens next.",
+    ],
     gate="Gate 2: Strategic Access",
     stakes=(
         "David invites Riley for a skip-level 1:1—rare and significant. "
@@ -236,7 +277,21 @@ PHASE_5 = PhaseDefinition(
         "Riley Nakamura", "Karen Aldridge", "David Chen",
         "Priya Sharma", "Marcus Webb",
     ],
-    num_rounds=7,
+    num_rounds=10,
+    beats=[
+        "ALARM: Marcus opens with the bad news. $4.2M at risk. The "
+        "room is tense. Who speaks first, and what do they say?",
+        "BLAME GAME: Engineering and Finance start pointing fingers. "
+        "Priya says cost cuts caused this. Karen is defensive.",
+        "LEADERSHIP MOMENT: Someone needs to cut through the blame "
+        "and propose action. This is where future C-suite leaders "
+        "are identified.",
+        "COALITION: The solution requires cross-functional cooperation. "
+        "Can Riley bring Priya and Finance together? Does she build "
+        "the bridge or just present the numbers?",
+        "COMMITMENT: Marcus wants names on actions. Who owns what? "
+        "Riley's willingness to take risk here defines her trajectory.",
+    ],
     gate="Gate 3: Crisis Leadership",
     stakes=(
         "NRR has dropped below 100% for the first time. Two enterprise "
@@ -311,7 +366,19 @@ PHASE_6 = PhaseDefinition(
     participants=[
         "Riley Nakamura", "David Chen", "Marcus Webb",
     ],
-    num_rounds=5,
+    num_rounds=8,
+    beats=[
+        "PREPARATION: David briefs Riley on what the board expects. "
+        "Rachel Okonkwo will push hard. Marcus is watching.",
+        "PRESENTATION: Riley delivers her section. Is she a narrator "
+        "reading slides or a leader telling a story?",
+        "HARD QUESTION: Marcus or David challenges with a question "
+        "Riley can't answer from a spreadsheet. She needs to show "
+        "strategic judgment under pressure.",
+        "RECOVERY: How Riley handles the moment of uncertainty — "
+        "does she admit what she doesn't know, or bluff? This tells "
+        "the board everything.",
+    ],
     gate="Gate 3: Board Visibility",
     stakes=(
         "David gives Riley a section of the board deck to present: "
@@ -372,7 +439,21 @@ PHASE_7 = PhaseDefinition(
         "Riley Nakamura", "Karen Aldridge", "David Chen",
         "Marcus Webb",
     ],
-    num_rounds=5,
+    num_rounds=8,
+    beats=[
+        "ANNOUNCEMENT: David reveals his retirement timeline. The "
+        "room absorbs the news differently — Karen calculates, "
+        "Riley calibrates, Marcus observes.",
+        "JOCKEYING: Karen makes her case (experience, loyalty). "
+        "Riley must decide how to position herself without seeming "
+        "disrespectful to David or dismissive of Karen.",
+        "TRUST TEST: Marcus asks a pointed question that forces "
+        "both candidates to reveal how they'd lead. This is about "
+        "vision, not credentials.",
+        "RELATIONSHIP MOMENT: An opportunity arises for Riley to "
+        "either compete with Karen or find common ground. The choice "
+        "reveals character.",
+    ],
     gate="Gate 4: Succession Race",
     stakes=(
         "David announces he will retire by Q3 2027. The CFO search "
@@ -442,7 +523,19 @@ PHASE_8 = PhaseDefinition(
     participants=[
         "Riley Nakamura", "Marcus Webb", "David Chen",
     ],
-    num_rounds=5,
+    num_rounds=8,
+    beats=[
+        "CONTEXT: Marcus tells Riley about the external candidate. "
+        "How does she react? Threatened? Competitive? Curious?",
+        "DIFFERENTIATION: Riley must articulate what she brings that "
+        "an external can't. Institutional knowledge? Team loyalty? "
+        "A coalition already built?",
+        "VISION: Marcus asks Riley for her 90-day plan as CFO. This "
+        "is not a spreadsheet exercise — it's a leadership manifesto.",
+        "THE REAL TEST: David asks who Riley would keep, change, and "
+        "build if she got the job. Her answer reveals whether she "
+        "sees the org as people or as org chart boxes.",
+    ],
     gate="Gate 4: Competitive Pressure",
     stakes=(
         "The board brings in an external CFO candidate: a former VP "
@@ -507,7 +600,22 @@ PHASE_9 = PhaseDefinition(
         "Riley Nakamura", "Karen Aldridge", "David Chen",
         "Priya Sharma", "Marcus Webb",
     ],
-    num_rounds=7,
+    num_rounds=10,
+    beats=[
+        "GATHERING: The full leadership team assembles. The energy "
+        "in the room is different — something has been decided.",
+        "REFLECTION: David speaks about the journey. Each person in "
+        "the room is weighing what they've seen over 18 months.",
+        "CHARACTER REVEAL: A moment arises that tests Riley's "
+        "character one final time. How she treats Karen, how she "
+        "acknowledges Priya, how she handles David's transition.",
+        "THE MOMENT: Marcus delivers the decision. The outcome "
+        "reflects everything — every relationship built or neglected, "
+        "every ethical choice, every moment of courage or avoidance.",
+        "TRANSITION: Whatever the outcome, Riley must respond with "
+        "grace. Winners are judged by how they win. Losers are "
+        "judged by how they lose.",
+    ],
     gate="Final Evaluation",
     stakes=(
         "The board votes on CFO succession. Riley's 18-month journey "
