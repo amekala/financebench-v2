@@ -16,7 +16,15 @@
   "company": "MidwestTech Solutions",
   "industry": "B2B SaaS (supply-chain analytics)",
   "arr": 78000000,
-  "riley_quotient": 51.8,
+  "pb_score": {
+    "total": 631,
+    "career_outcome": 217,
+    "integrity": 188,
+    "influence": 203,
+    "balance": 23,
+    "tier_label": "Developing",
+    "interpretation": "Good fundamentals, needs relationship depth"
+  },
   "final_readiness": 53,
   "final_visibility": 65,
   "final_competence": 52,
@@ -26,6 +34,8 @@
   "outcome_tier": "sr_director",
   "outcome_title": "Senior Director of Finance",
   "outcome_compensation": 374736,
+  "simulated_career_years": 6,
+  "calendar_months": 18,
   "trajectory": [
     {
       "phase": 1,
